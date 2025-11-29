@@ -1,0 +1,11 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Make sure the base path is correct
+RewriteBase /
+# If the requested file exists, serve it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Otherwise, rewrite everything to index.php
+RewriteRule ^ api\/index.php [QSA,L]
