@@ -1,0 +1,11 @@
+CREATE TABLE ReservationTable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    showId INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL, 
+    -- number of ticket
+    tickets INT NOT NULL DEFAULT 1, 
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)
