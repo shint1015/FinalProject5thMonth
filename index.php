@@ -9,6 +9,7 @@ include_once __DIR__ . '/src/Routes/ReservationRoute.php';
 include_once __DIR__ . '/src/Routes/PaymentRoute.php';
 include_once __DIR__ . '/src/Routes/SeatRoute.php';
 require_once __DIR__ . '/src/Helpers/AppLogger.php';
+include_once __DIR__ . '/src/Routes/AuthRoute.php';
 
 // appLog is provided by Helpers\AppLogger
 
@@ -57,7 +58,7 @@ function responseHandler($data, $code) {
 // Handlers for GET requests
 function handleGet($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
-        $response = ShowStatusRouter($pathInfo, "GET");
+        $response = ShowStatusRouter($pathInfo, "POST");
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "GET");
@@ -67,6 +68,9 @@ function handleGet($pathInfo) {
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "GET");
+        responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'POST');
         responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
@@ -87,9 +91,13 @@ function handlePost($pathInfo) {
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "POST");
         responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'POST');
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
+
 }
 
 // Handlers for PUT requests
@@ -106,9 +114,13 @@ function handlePut($pathInfo) {
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "PUT");
         responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'POST');
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
+
 }
 
 // Handlers for DELETE requests
@@ -124,6 +136,9 @@ function handleDelete($pathInfo) {
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'POST');
         responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
