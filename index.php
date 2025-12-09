@@ -34,6 +34,9 @@ function handleGet($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "GET");
         responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'reservation')) {
+        $response = ReservationRouter($pathInfo, "GET");
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -43,6 +46,8 @@ function handleGet($pathInfo) {
 function handlePost($pathInfo) {
     if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
         ShowStatusRouter($pathInfo, "POST");
+    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
+        ReservationRouter($pathInfo, "POST");    
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -52,16 +57,19 @@ function handlePost($pathInfo) {
 function handlePut($pathInfo) {
     if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
         ShowStatusRouter($pathInfo, "PUT");
+    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
+        ReservationRouter($pathInfo, "PUT");
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
-
 }
 
 // Handlers for DELETE requests
 function handleDelete($pathInfo) {
     if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
         ShowStatusRouter($pathInfo, "DELETE");
+    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
+        ReservationRouter($pathInfo, "DELETE");
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
