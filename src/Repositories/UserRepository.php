@@ -7,32 +7,65 @@ class UserRepository {
     {
         $this->pdo = $pdo;
     }
-    public function findByUsername(string $username): ?array {
-        $stmt = $this->pdo->prepare('SELECT id, username, password FROM users WHERE username = :username LIMIT 1');
-        $stmt->execute([':username' => $username]);
-        $row = $stmt->fetch();
+    /**
+     * Find a user by email (primary identifier in schema).
+     */
+    public function findByEmail(string $email): ?array {
+        $stmt = $this->pdo->prepare('SELECT id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE email = :email LIMIT 1');
+        $stmt->execute([':email' => $email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
 
-    public function create(string $username, string $hashedPassword): ?array {
-        $stmt = $this->pdo->prepare('INSERT INTO users (username, password) VALUES (:u, :p)');
-        if (!$stmt->execute([':u' => $username, ':p' => $hashedPassword])) {
+    /**
+     * Backwards-compatible alias used by existing code paths.
+     */
+    public function findByUsername(string $username): ?array {
+        return $this->findByEmail($username);
+    }
+
+    /**
+     * Find a user by id.
+     */
+    public function findById(int $id): ?array {
+        $stmt = $this->pdo->prepare('SELECT id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    /**
+     * Create a new user. Defaults role to 'general'.
+     */
+    public function create(string $email, string $hashedPassword, ?string $firstName = null, ?string $lastName = null, ?string $displayName = null, string $role = 'general'): ?array {
+        $stmt = $this->pdo->prepare('INSERT INTO users (email, first_name, last_name, display_name, password, role) VALUES (:email, :first_name, :last_name, :display_name, :password, :role)');
+        $ok = $stmt->execute([
+            ':email' => $email,
+            ':first_name' => $firstName,
+            ':last_name' => $lastName,
+            ':display_name' => $displayName,
+            ':password' => $hashedPassword,
+            ':role' => $role,
+        ]);
+        if (!$ok) {
             return null;
         }
         $id = (int)$this->pdo->lastInsertId();
-        return ['id' => $id, 'username' => $username, 'password' => $hashedPassword];
+        return $this->findById($id);
     }
 
+    /**
+     * Update fields on a user. Allowed: email, password, first_name, last_name, display_name, role
+     */
     public function update(int $id, array $fields): ?array {
+        $allowed = ['email', 'password', 'first_name', 'last_name', 'display_name', 'role'];
         $sets = [];
         $params = [':id' => $id];
-        if (isset($fields['username'])) {
-            $sets[] = 'username = :u';
-            $params[':u'] = (string)$fields['username'];
-        }
-        if (isset($fields['password'])) {
-            $sets[] = 'password = :p';
-            $params[':p'] = (string)$fields['password'];
+        foreach ($allowed as $key) {
+            if (array_key_exists($key, $fields)) {
+                $sets[] = "$key = :$key";
+                $params[":" . $key] = $fields[$key];
+            }
         }
         if (empty($sets)) {
             return null;
@@ -42,10 +75,7 @@ class UserRepository {
         if (!$stmt->execute($params)) {
             return null;
         }
-        $stmt2 = $this->pdo->prepare('SELECT id, username, password FROM users WHERE id = :id');
-        $stmt2->execute([':id' => $id]);
-        $row = $stmt2->fetch();
-        return $row ?: null;
+        return $this->findById($id);
     }
 
     public function delete(int $id): bool {
