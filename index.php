@@ -37,6 +37,12 @@ function handleGet($pathInfo) {
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "GET");
         responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'payment')) {
+        $response = PaymentRouter($pathInfo, "GET");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'seat')) {
+        $response = PaymentRouter($pathInfo, "GET");
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -47,6 +53,10 @@ function handlePost($pathInfo) {
     if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
         ShowStatusRouter($pathInfo, "POST");
     } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
+        ReservationRouter($pathInfo, "POST");   
+    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
+        ReservationRouter($pathInfo, "POST");    
+    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
         ReservationRouter($pathInfo, "POST");    
     } else {
         responseHandler(["error" => "Not Found"], 404);
@@ -59,6 +69,10 @@ function handlePut($pathInfo) {
         ShowStatusRouter($pathInfo, "PUT");
     } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
         ReservationRouter($pathInfo, "PUT");
+    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
+        ReservationRouter($pathInfo, "PUT");
+    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
+        ReservationRouter($pathInfo, "PUT");
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -69,6 +83,10 @@ function handleDelete($pathInfo) {
     if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
         ShowStatusRouter($pathInfo, "DELETE");
     } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
+        ReservationRouter($pathInfo, "DELETE");
+    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
+        ReservationRouter($pathInfo, "DELETE");
+    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
         ReservationRouter($pathInfo, "DELETE");
     } else {
         responseHandler(["error" => "Not Found"], 404);
