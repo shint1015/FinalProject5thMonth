@@ -1,4 +1,8 @@
 <?php
+// Start session early for session-based auth
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set("display_errors", 1);
 include __DIR__ ."/config/env.php";
 include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
@@ -33,11 +37,11 @@ function responseHandler($data, $code) {
 // Handlers for GET requests
 function handleGet($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
-        $response = ShowStatusRouter($pathInfo, "POST");
+        $response = ShowStatusRouter($pathInfo, "GET");
         responseHandler(...$response);
         return;
     }else if (str_contains($pathInfo, 'auth')) {
-        $response = AuthRouter($pathInfo, 'POST');
+        $response = AuthRouter($pathInfo, 'GET');
         responseHandler(...$response);
         return;
     }
