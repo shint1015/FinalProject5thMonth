@@ -23,7 +23,7 @@ class PaymentService
     // List all payments
     public function getPaymentList(): array
     {
-        return $this->repo->findAll(); // optional — if you don't have findAll, I can add it
+        return $this->repo->findAll(); 
     }
 
     // List payments by reservation_id

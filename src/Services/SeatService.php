@@ -20,15 +20,6 @@ class SeatService
         return $this->repo->findById($id);
     }
 
-    // List all seats (if you have findAll)
-    public function getSeatList(): array
-    {
-        if (method_exists($this->repo, 'findAll')) {
-            return $this->repo->findAll();
-        }
-        return []; // optional fallback
-    }
-
     // Get seats belonging to a reservation
     public function getSeatsByReservation(int $reservationId): array
     {

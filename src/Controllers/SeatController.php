@@ -33,7 +33,6 @@ class SeatController
     }
 
     // GET /seat/reservation/{id}
-    // (You can add route later if needed)
     public function listSeatsByReservation(int $reservationId): array
     {
         $list = $this->service->getSeatsByReservation($reservationId);

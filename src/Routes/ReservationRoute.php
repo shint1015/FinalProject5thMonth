@@ -40,7 +40,7 @@ function ReservationRouter(string $pathInfo, string $method): array
                 return $controller->updateStatus($id);
             }
 
-            // PUT /reservation/10/duration  (extend or update countdown)
+            // PUT /reservation/10/duration
             if ($resource === 'reservation' && is_numeric($id) && $extra === 'duration') {
                 return $controller->updateDuration($id);
             }

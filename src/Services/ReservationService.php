@@ -41,9 +41,6 @@ class ReservationService
         // Default status = pending
         $data['status'] = $data['status'] ?? 'pending';
 
-        // Optional: set duration to 10 minutes from now if not provided
-        $data['duration'] = $data['duration'] ?? date('Y-m-d H:i:s', strtotime('+10 minutes'));
-
         return $this->repo->create($data);
     }
 
@@ -56,17 +53,6 @@ class ReservationService
         }
 
         return $this->repo->updateStatus($id, $status);
-    }
-
-    // Optional: update duration manually
-    public function updateDuration(int $id, string $newDuration): int
-    {
-        if ($id <= 0 || empty($newDuration)) {
-            return 0;
-        }
-
-        // You would need to implement updateDuration() in ReservationRepository
-        return $this->repo->updateDuration($id, $newDuration);
     }
 
     // Delete reservation
