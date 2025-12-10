@@ -1,8 +1,6 @@
 <?php
 
-include_once __DIR__ . '/../Repositories/ReservationRepository.php';
 include_once __DIR__ . '/../Services/ReservationService.php';
-include_once __DIR__ . '/../../config/database.php';
 
 class ReservationController
 {
@@ -10,61 +8,87 @@ class ReservationController
 
     public function __construct()
     {
-        $repo = new ReservationRepository(db());
+        $repo = new ReservationRepository(Database::getInstance()->getConnection());
         $this->service = new ReservationService($repo);
     }
 
-    public function getReservation(string $id): array
+    // GET /reservation/{id}
+    public function getReservation(int $id): array
     {
-        $res = $this->service->getReservation((int)$id);
-        if (!$res) return [['error' => 'Reservation not found'], 404];
-
-        return [['data' => $res], 200];
+        $reservation = $this->service->getReservation($id);
+        if (!$reservation) {
+            return [['error' => 'Reservation not found'], 404];
+        }
+        return [$reservation, 200];
     }
 
-    public function listByShow(string $showId): array
+    // GET /reservation/show/{show_id}
+    public function listByShow(int $showId): array
     {
-    $list = $this->service->listReservationsForShow((int)$showId);
-
-        if (!$list) return [['error' => 'No reservations found'], 404];
-
-        return [['data' => $list], 200];
+        $reservations = $this->service->listReservationsForShow($showId);
+        return [$reservations, 200];
     }
-    //create
+
+    // POST /reservation
     public function create(): array
     {
-        $data = [
-            'showId' => (int)($_POST['showId'] ?? 0),
-            'name' => htmlspecialchars($_POST['name'] ?? "", ENT_QUOTES, "UTF-8"),
-            'email' => htmlspecialchars($_POST['email'] ?? "", ENT_QUOTES, "UTF-8"),
-            'tickets' => (int)($_POST['tickets'] ?? 1)
-        ];
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data) {
+            return [['error' => 'Invalid JSON'], 400];
+        }
 
         $id = $this->service->createReservation($data);
 
-        if (!$id) return [['error' => 'Reservation not created'], 400];
+        if ($id === 0) {
+            return [['error' => 'Invalid reservation data'], 400];
+        }
 
-        return [['data' => ['id' => $id]], 201];
+        return [['message' => 'Reservation created', 'reservation_id' => $id], 201];
     }
-    //update
-    public function updateStatus(string $id): array
+
+    // PUT /reservation/{id}/status
+    public function updateStatus(int $id): array
     {
-        $status = htmlspecialchars($_POST['status'] ?? "", ENT_QUOTES, 'UTF-8');
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || empty($data['status'])) {
+            return [['error' => 'Status is required'], 400];
+        }
 
-        $update = $this->service->updateStatus((int)$id, $status);
+        $updated = $this->service->updateStatus($id, $data['status']);
 
-        if (!$update) return [['error' => 'Status not updated'], 400];
+        if ($updated === 0) {
+            return [['error' => 'Update failed'], 400];
+        }
 
-        return [['message' => 'Status updated successfully'], 200];
+        return [['message' => 'Status updated'], 200];
     }
-    //deleate
-    public function deleteReservation(string $id): array
+
+    // PUT /reservation/{id}/duration
+    public function updateDuration(int $id): array
     {
-    $deleted = $this->service->delete((int)$id);
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!$data || empty($data['duration'])) {
+            return [['error' => 'Duration is required'], 400];
+        }
 
-    if (!$deleted) return [['error' => 'Reservation not deleted'], 400];
+        $updated = $this->service->updateDuration($id, $data['duration']);
 
-    return [['message' => 'Reservation deleted successfully'], 200];
+        if ($updated === 0) {
+            return [['error' => 'Update failed'], 400];
+        }
+
+        return [['message' => 'Duration updated'], 200];
     }
 
+    // DELETE /reservation/{id}
+    public function deleteReservation(int $id): array
+    {
+        $deleted = $this->service->deleteReservation($id);
+
+        if ($deleted === 0) {
+            return [['error' => 'Delete failed'], 400];
+        }
+
+        return [['message' => 'Reservation deleted'], 200];
+    }
 }

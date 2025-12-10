@@ -1,18 +1,19 @@
 <?php
 
-class ReservationRepository 
+class ReservationRepository
 {
     private PDO $pdo;
-    
+
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
+    // Get reservation by reservation_id
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-            SELECT * FROM ReservationTable WHERE id = :id
+            SELECT * FROM ReservationTable WHERE reservation_id = :id
         ");
         $stmt->execute(['id' => $id]);
 
@@ -20,52 +21,77 @@ class ReservationRepository
         return $result ?: null;
     }
 
-    public function findByShow(int $showId): ?array
+    // Get reservations by show_id
+    public function findByShow(int $showId): array
     {
         $stmt = $this->pdo->prepare("
-            SELECT * FROM ReservationTable WHERE showId = :showId
+            SELECT * FROM ReservationTable WHERE show_id = :show_id
         ");
-        $stmt->execute(['showId' => $showId]);
+        $stmt->execute(['show_id' => $showId]);
 
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $result ?: null;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Create a reservation
     public function create(array $data): int
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO ReservationTable (showId, name, email, tickets, status)
-            VALUES (:showId, :name, :email, :tickets, :status)
+            INSERT INTO ReservationTable (
+                show_id, 
+                user_id, 
+                status, 
+                ticket_amount, 
+                ticket_total_price,
+                duration
+            ) VALUES (
+                :show_id,
+                :user_id,
+                :status,
+                :ticket_amount,
+                :ticket_total_price,
+                :duration
+            )
         ");
 
         $stmt->execute([
-            'showId' => $data['showId'],
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'tickets' => $data['tickets'],
-            'status' => $data['status']
+            'show_id'            => $data['show_id'],
+            'user_id'            => $data['user_id'],
+            'status'             => $data['status'],
+            'ticket_amount'      => $data['ticket_amount'],
+            'ticket_total_price' => $data['ticket_total_price'],
+            'duration'           => $data['duration']   // timestamp
         ]);
 
         return (int)$this->pdo->lastInsertId();
     }
-    
+
+    // Update reservation status
     public function updateStatus(int $id, string $status): int
     {
         $stmt = $this->pdo->prepare("
-            UPDATE ReservationTable SET status = :status WHERE id = :id
+            UPDATE ReservationTable 
+            SET status = :status 
+            WHERE reservation_id = :id
         ");
-        $stmt->execute(['status' => $status, 'id' => $id]);
+
+        $stmt->execute([
+            'status' => $status,
+            'id'     => $id
+        ]);
 
         return $stmt->rowCount();
     }
 
+    // Delete reservation
     public function delete(int $id): int
     {
-        $stmt = $this->pdo->prepare("DELETE FROM ReservationTable WHERE id = :id");
+        $stmt = $this->pdo->prepare("
+            DELETE FROM ReservationTable WHERE reservation_id = :id
+        ");
         $stmt->execute(['id' => $id]);
+
         return $stmt->rowCount();
     }
-
 }
 
 ?>
