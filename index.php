@@ -1,4 +1,8 @@
 <?php
+// Start session early for session-based auth
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 
@@ -58,7 +62,7 @@ function responseHandler($data, $code) {
 // Handlers for GET requests
 function handleGet($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
-        $response = ShowStatusRouter($pathInfo, "POST");
+        $response = ShowStatusRouter($pathInfo, "GET");
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "GET");
@@ -70,7 +74,7 @@ function handleGet($pathInfo) {
         $response = SeatRouter($pathInfo, "GET");
         responseHandler(...$response);
     }else if (str_contains($pathInfo, 'auth')) {
-        $response = AuthRouter($pathInfo, 'POST');
+        $response = AuthRouter($pathInfo, 'GET');
         responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);

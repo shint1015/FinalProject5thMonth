@@ -44,15 +44,30 @@ class AuthController {
 		$secret = defined('JWT_SECRET') ? JWT_SECRET : 'change-me';
 
 		$token = jwt_encode($payload, $secret, 'HS256');
+		echo session_status() === PHP_SESSION_ACTIVE ? "TRUE" : "FALSE" . "<br>";
+		// Store minimal profile in session for session-based auth
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			$_SESSION['user'] = [
+				'id' => $user['id'] ?? null,
+				'email' => $user['email'] ?? ($user['username'] ?? $username),
+				'role' => $user['role'] ?? 'general',
+				'display_name' => $user['display_name'] ?? null,
+			];
+		}
+
 		return [[
 			'access_token' => $token,
-			// 'token_type' => 'Bearer',
 			'expires_in' => 3600,
 		], 200];
 	}
 
 	public function logout(): array {
-		return [["message" => "logout successful (client-side token discard)"], 200];
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			unset($_SESSION['user']);
+			session_unset();
+			session_destroy();
+		}
+		return [["message" => "logout successful"], 200];
 	}
 
 	public function refresh_token(): array {
@@ -91,6 +106,21 @@ class AuthController {
 			'display_name' => $created['display_name'] ?? $displayName,
 			'role' => $created['role'] ?? $role,
 		], 201];
+	}
+
+	// Current user from session (fallback to JWT if no session)
+	public function me(): array {
+		// Prefer session
+		if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user'])) {
+			return [$_SESSION['user'], 200];
+		}
+		// Fallback: try Authorization bearer
+		$auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+		$user = $this->service->getUserFromToken($auth);
+		if ($user !== null) {
+			return [$user, 200];
+		}
+		return [["error" => "unauthorized"], 401];
 	}
 
 	// (removed duplicate logout definition)
