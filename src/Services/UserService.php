@@ -56,20 +56,25 @@ class UserService {
     /**
      * Create a new user account. Returns new user row or null on failure.
      */
-    public function createUser(string $username, string $password): ?array
+    public function createUser(string $email, string $password, ?string $firstName = null, ?string $lastName = null, ?string $displayName = null, string $role = 'general'): ?array
     {
         // Basic validation
-        $username = trim($username);
-        if ($username === '' || $password === '') {
+        $email = trim($email);
+        if ($email === '' || $password === '') {
             return null;
         }
-        // Prevent duplicate usernames
-        if ($this->repo->findByUsername($username) !== null) {
+        // Prevent duplicate emails
+        if ($this->repo->findByEmail($email) !== null) {
             return null;
         }
         // Hash password and delegate to repository
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        return $this->repo->create($username, $hash);
+        // Normalize role
+        $roleNorm = strtolower($role);
+        if (!in_array($roleNorm, ['admin', 'general'], true)) {
+            $roleNorm = 'general';
+        }
+        return $this->repo->create($email, $hash, $firstName, $lastName, $displayName, $roleNorm);
     }
 
     /**

@@ -60,20 +60,36 @@ class AuthController {
 	}
 
 	// Sign up (account creation)
-	public function signin(): array {
-		$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, "UTF-8") ?? '');
+	public function signup(): array {
+		// Accept email or username (treated as email)
+		$email = trim(htmlspecialchars($_POST['email'] ?? ($_POST['username'] ?? ''), ENT_QUOTES, "UTF-8"));
 		$password = htmlspecialchars($_POST['password'] ?? '', ENT_QUOTES, "UTF-8");
-		if ($username === '' || $password === '') {
-			return [["error" => "username and password are required"], 400];
+		$firstName = isset($_POST['first_name']) ? trim(htmlspecialchars($_POST['first_name'], ENT_QUOTES, "UTF-8")) : null;
+		$lastName = isset($_POST['last_name']) ? trim(htmlspecialchars($_POST['last_name'], ENT_QUOTES, "UTF-8")) : null;
+		$displayName = isset($_POST['display_name']) ? trim(htmlspecialchars($_POST['display_name'], ENT_QUOTES, "UTF-8")) : null;
+		$role = isset($_POST['role']) ? trim(strtolower(htmlspecialchars($_POST['role'], ENT_QUOTES, "UTF-8"))) : 'general';
+
+		if ($email === '' || $password === '') {
+			return [["error" => "email and password are required"], 400];
 		}
-		$created = $this->service->createUser($username, $password);
+
+		// Only allow 'admin' or 'general'
+		if (!in_array($role, ['admin', 'general'], true)) {
+			$role = 'general';
+		}
+
+		$created = $this->service->createUser($email, $password, $firstName, $lastName, $displayName, $role);
 		if ($created === null) {
-			return [["error" => "cannot create user (maybe duplicate username or invalid input)"], 400];
+			return [["error" => "cannot create user (duplicate email or invalid input)"], 400];
 		}
 		// Do not return password hash
 		return [[
 			'id' => $created['id'],
-			'username' => $created['username'],
+			'email' => $created['email'] ?? $email,
+			'first_name' => $created['first_name'] ?? $firstName,
+			'last_name' => $created['last_name'] ?? $lastName,
+			'display_name' => $created['display_name'] ?? $displayName,
+			'role' => $created['role'] ?? $role,
 		], 201];
 	}
 

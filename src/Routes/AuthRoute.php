@@ -11,8 +11,8 @@ function AuthRouter(string $pathInfo, string $method):array {
     if ($resource === 'auth' && $action === 'login' && $method === 'POST') {
         return $authController->login();
     }
-    if ($resource === 'auth' && $action === 'signin' && $method === 'POST') {
-        return $authController->signin();
+    if ($resource === 'auth' && $action === 'signup' && $method === 'POST') {
+        return $authController->signup();
     }
     if ($resource === 'auth' && $action === 'logout' && $method === 'POST') {
         return $authController->logout();
