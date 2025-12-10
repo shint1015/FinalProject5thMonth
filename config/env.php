@@ -12,3 +12,6 @@ define('DB_DATABASE', 'elephantSamurai');     // your database name
 define('DB_USERNAME', 'root');       // your DB user
 define('DB_PASSWORD', 'mysql');   // your DB password
 define('DB_CHARSET', 'utf8mb4');
+
+// JWT settings
+define('JWT_SECRET', 'dev-secret-change-this');
