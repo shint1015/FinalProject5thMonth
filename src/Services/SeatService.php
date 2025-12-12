@@ -40,7 +40,7 @@ class SeatService
             return 0;
         }
 
-        return $this->repo->create([
+        return $this->repo->createSeat([
             'reservation_id' => $data['reservation_id'],
             'seat_number'    => $data['seat_number'],
             'seat_price'     => $data['seat_price']
@@ -61,7 +61,7 @@ class SeatService
             return 0;
         }
 
-        return $this->repo->update($id, [
+        return $this->repo->updateSeat($id, [
             'seat_number' => $data['seat_number'],
             'seat_price'  => $data['seat_price']
         ]);

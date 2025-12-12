@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/../Services/ReservationService.php';
+include_once __DIR__ . '/../../config/database.php';
 
 class ReservationController
 {
@@ -8,7 +9,7 @@ class ReservationController
 
     public function __construct()
     {
-        $repo = new ReservationRepository(Database::getInstance()->getConnection());
+        $repo = new ReservationRepository(db());
         $this->service = new ReservationService($repo);
     }
 
@@ -16,51 +17,81 @@ class ReservationController
     public function getReservation(int $id): array
     {
         $reservation = $this->service->getReservation($id);
+        echo "aiya";
         if (!$reservation) {
-            return [['error' => 'Reservation not found'], 404];
+            return [[
+                'success'=> false,
+                'error' => 'Reservation not found'], 404];
         }
-        return [$reservation, 200];
+        return [[
+            'success'=> true,
+            'data'=> $reservation,
+            'message'=> "User's reservation"
+        ], 200];
     }
 
     // GET /reservation/show/{show_id}
     public function listByShow(int $showId): array
     {
         $reservations = $this->service->listReservationsForShow($showId);
-        return [$reservations, 200];
+        return [[
+            'success'=> true,
+            'data'=> $reservation,
+            'message'=> "List of reservation"
+        ], 200];
     }
 
     // POST /reservation
-    public function create(): array
-    {
+    public function createReservation(): array
+    {   
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data) {
-            return [['error' => 'Invalid JSON'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
         }
 
         $id = $this->service->createReservation($data);
 
         if ($id === 0) {
-            return [['error' => 'Invalid reservation data'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Invalid reservation data'
+            ], 400];
         }
 
-        return [['message' => 'Reservation created', 'reservation_id' => $id], 201];
+        return [[
+            'success' => true,
+            'reservation_id' => $id,
+            'message' => 'Reservation created'
+        ], 201];
     }
 
-    // PUT /reservation/{id}/status
-    public function updateStatus(int $id): array
+    // PUT /reservation/{id}
+    public function updateReservation(int $id): array
     {
         $data = json_decode(file_get_contents('php://input'), true);
-        if (!$data || empty($data['status'])) {
-            return [['error' => 'Status is required'], 400];
+        if (!$data) {
+            return [[
+                'success' => false,
+                'error' => 'Status is required'
+            ], 400];
         }
 
-        $updated = $this->service->updateStatus($id, $data['status']);
+        $updated = $this->service->updateReservation($id, $data);
 
         if ($updated === 0) {
-            return [['error' => 'Update failed'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Update failed'
+            ], 400];
         }
 
-        return [['message' => 'Status updated'], 200];
+        return [[
+            'success' => true,
+            'message' => 'Status updated'
+        ], 200];
     }
 
     // PUT /reservation/{id}/duration
@@ -68,16 +99,25 @@ class ReservationController
     {
         $data = json_decode(file_get_contents('php://input'), true);
         if (!$data || empty($data['duration'])) {
-            return [['error' => 'Duration is required'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Duration is required'
+            ], 400];
         }
 
         $updated = $this->service->updateDuration($id, $data['duration']);
 
         if ($updated === 0) {
-            return [['error' => 'Update failed'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Update failed'
+            ], 400];
         }
 
-        return [['message' => 'Duration updated'], 200];
+        return [[
+            'success' => true,
+            'message' => 'Duration updated'
+        ], 200];
     }
 
     // DELETE /reservation/{id}
@@ -86,9 +126,15 @@ class ReservationController
         $deleted = $this->service->deleteReservation($id);
 
         if ($deleted === 0) {
-            return [['error' => 'Delete failed'], 400];
+            return [[
+                'success' => false,
+                'error' => 'Delete failed'
+            ], 400];
         }
 
-        return [['message' => 'Reservation deleted'], 200];
+        return [[
+            'success' => true,
+            'message' => 'Reservation deleted'
+        ], 200];
     }
 }

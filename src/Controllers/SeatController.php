@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/../Services/SeatService.php';
+include_once __DIR__ . '/../../config/database.php';
 
 class SeatController
 {
@@ -8,7 +9,7 @@ class SeatController
 
     public function __construct()
     {
-        $repo = new SeatRepository(Database::getInstance()->getConnection());
+        $repo = new SeatRepository(db());
         $this->service = new SeatService($repo);
     }
 
@@ -18,10 +19,17 @@ class SeatController
         $seat = $this->service->getSeat($id);
 
         if (!$seat) {
-            return [['error' => 'Seat not found'], 404];
+            return [[
+                'success'=> false,
+                'error' => 'Seat not found',
+            ], 404];
         }
 
-        return [$seat, 200];
+        return [[
+            'success'=> true,
+            'date' => $seat,
+            'message'=> "User's reservation"
+        ], 200];
     }
 
     // GET /seat/list
@@ -29,7 +37,11 @@ class SeatController
     {
         $list = $this->service->getSeatList();
 
-        return [$list, 200];
+        return [[
+            'success'=> true,
+            'date' => $list,
+            'message'=> "User's list"
+        ], 200];
     }
 
     // GET /seat/reservation/{id}
@@ -37,7 +49,11 @@ class SeatController
     {
         $list = $this->service->getSeatsByReservation($reservationId);
 
-        return [$list, 200];
+        return [[
+            'success'=> true,
+            'date' => $list,
+            'message'=> "User's list"
+        ], 200];
     }
 
     // POST /seat
@@ -46,16 +62,26 @@ class SeatController
         $data = json_decode(file_get_contents('php://input'), true);
 
         if (!$data) {
-            return [['error' => 'Invalid JSON'], 400];
+            return [[
+                'success'=> false,
+                'error' => 'Invalid JSON'
+            ], 400];
         }
 
         $id = $this->service->createSeat($data);
 
         if ($id === 0) {
-            return [['error' => 'Invalid seat data'], 400];
+            return [[
+                'success'=> false,
+                'error' => 'Invalid seat data'
+            ], 400];
         }
 
-        return [['message' => 'Seat created', 'seat_id' => $id], 201];
+        return [[
+            'success'=> true,
+            'seat_id' => $id,
+            'message' => 'Seat created'
+        ], 201];
     }
 
     // PUT /seat/{id}
@@ -64,16 +90,25 @@ class SeatController
         $data = json_decode(file_get_contents('php://input'), true);
 
         if (!$data) {
-            return [['error' => 'Invalid JSON'], 400];
+            return [[
+                'success'=> false,
+                'error' => 'Invalid JSON'
+            ], 400];
         }
 
         $updated = $this->service->updateSeat($id, $data);
 
         if ($updated === 0) {
-            return [['error' => 'Update failed'], 400];
+            return [[
+                'success'=> false,
+                'error' => 'Update failed'
+            ], 400];
         }
 
-        return [['message' => 'Seat updated'], 200];
+        return [[
+            'success'=> true,
+            'message' => 'Seat updated'
+        ], 200];
     }
 
     // DELETE /seat/{id}
@@ -82,9 +117,15 @@ class SeatController
         $deleted = $this->service->deleteSeat($id);
 
         if ($deleted === 0) {
-            return [['error' => 'Delete failed'], 400];
+            return [[
+                'success'=> false,
+                'error' => 'Delete failed'
+            ], 400];
         }
 
-        return [['message' => 'Seat deleted'], 200];
+        return [[
+            'success'=> true,
+            'message' => 'Seat deleted'
+        ], 200];
     }
 }

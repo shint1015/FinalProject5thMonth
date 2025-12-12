@@ -48,8 +48,8 @@ class ShowStatusService
         return $this->repo->deleteStatusById($id);
     }
     public function delete(int $id): int
-    {
-        if ($id <= 0) return 0;
-        return $this->repo->delete($id);
-    }
+{
+    if ($id <= 0) return 0;
+    return $this->repo->delete($id);
+}
 }

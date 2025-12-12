@@ -2,6 +2,10 @@
 ini_set("display_errors", 1);
 include __DIR__ ."/config/env.php";
 include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
+include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
+include_once __DIR__ . '/src/Routes/ReservationRoute.php';
+include_once __DIR__ . '/src/Routes/PaymentRoute.php';
+include_once __DIR__ . '/src/Routes/SeatRoute.php';
 
 $method = $_SERVER["REQUEST_METHOD"];
 $pathInfo = isset($_SERVER["PATH_INFO"]) ? ltrim($_SERVER["PATH_INFO"], '/') : '';
@@ -41,7 +45,7 @@ function handleGet($pathInfo) {
         $response = PaymentRouter($pathInfo, "GET");
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'seat')) {
-        $response = PaymentRouter($pathInfo, "GET");
+        $response = SeatRouter($pathInfo, "GET");
         responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
@@ -50,14 +54,18 @@ function handleGet($pathInfo) {
 
 // Handlers for POST requests
 function handlePost($pathInfo) {
-    if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
-        ShowStatusRouter($pathInfo, "POST");
-    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
-        ReservationRouter($pathInfo, "POST");   
-    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
-        ReservationRouter($pathInfo, "POST");    
-    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
-        ReservationRouter($pathInfo, "POST");    
+    if (str_contains($pathInfo, 'show_status')) {
+        $response = ShowStatusRouter($pathInfo, "POST");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'reservation')) {
+        $response = ReservationRouter($pathInfo, "POST");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'payment')) {
+        $response = PaymentRouter($pathInfo, "POST");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'seat')) {
+        $response = SeatRouter($pathInfo, "POST");
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -65,14 +73,18 @@ function handlePost($pathInfo) {
 
 // Handlers for PUT requests
 function handlePut($pathInfo) {
-    if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
-        ShowStatusRouter($pathInfo, "PUT");
-    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
-        ReservationRouter($pathInfo, "PUT");
-    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
-        ReservationRouter($pathInfo, "PUT");
-    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
-        ReservationRouter($pathInfo, "PUT");
+    if (str_contains($pathInfo, 'show_status')) {
+        $response = ShowStatusRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'reservation')) {
+        $response = ReservationRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'payment')) {
+        $response = PaymentRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'seat')) {
+        $response = SeatRouter($pathInfo, "PUT");
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -80,14 +92,18 @@ function handlePut($pathInfo) {
 
 // Handlers for DELETE requests
 function handleDelete($pathInfo) {
-    if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
-        ShowStatusRouter($pathInfo, "DELETE");
-    } else if ($pathInfo === 'reservation' || $pathInfo === 'reservation/list') {
-        ReservationRouter($pathInfo, "DELETE");
-    } else if ($pathInfo === 'payment' || $pathInfo === 'payment/list') {
-        ReservationRouter($pathInfo, "DELETE");
-    } else if ($pathInfo === 'seat' || $pathInfo === 'seat/list') {
-        ReservationRouter($pathInfo, "DELETE");
+    if (str_contains($pathInfo, 'show_status')) {
+        $response = ShowStatusRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'reservation')) {
+        $response = ReservationRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'payment')) {
+        $response = PaymentRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'seat')) {
+        $response = SeatRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }

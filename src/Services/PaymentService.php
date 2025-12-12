@@ -58,12 +58,26 @@ class PaymentService
     }
 
     // Update payment status
-    public function updatePaymentStatus(int $id, string $status): int
+    public function updatePayment(int $id, array $data): int
     {
-        if ($id <= 0 || empty($status)) {
+        $allowed = ['pending', 'confirmed', 'cancelled'];
+
+        foreach($data as $key => &$value){
+            $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            if ($key == "reservation_id" || $key == "credit_number") {
+                if (!is_numeric($value)) {
+                    return 0;
+                }
+            } else if ($key == "status" && !in_array($value, $allowed)) {
+                return 0;
+            }
+        }
+
+        if ($id <= 0) {
             return 0;
         }
-        return $this->repo->updateStatus($id, $status);
+
+        return $this->repo->update($id, $data);
     }
 
     // Delete payment

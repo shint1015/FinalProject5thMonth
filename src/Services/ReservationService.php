@@ -44,15 +44,34 @@ class ReservationService
         return $this->repo->create($data);
     }
 
+    //count down
+    public function updateDuration(int $id, string $duration): int
+    {
+    if ($id <= 0 || empty($duration)) return 0;
+    return $this->repo->updateDuration($id, $duration);
+    }
+
     // Update reservation status
-    public function updateStatus(int $id, string $status): int
+    public function updateReservation(int $id, array $data): int
     {
         $allowed = ['pending', 'confirmed', 'cancelled'];
-        if ($id <= 0 || !in_array($status, $allowed)) {
+
+        foreach($data as $key => &$value){
+            $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            if ($key == "show_id" || $key == "ticket_amount" || $key == "ticket_total_price") {
+                if (!is_numeric($value)) {
+                    return 0;
+                }
+            } else if ($key == "status" && !in_array($value, $allowed)) {
+                return 0;
+            }
+        }
+
+        if ($id <= 0) {
             return 0;
         }
 
-        return $this->repo->updateStatus($id, $status);
+        return $this->repo->update($id, $data);
     }
 
     // Delete reservation

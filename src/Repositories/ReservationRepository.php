@@ -13,7 +13,7 @@ class ReservationRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->pdo->prepare("
-            SELECT * FROM ReservationTable WHERE reservation_id = :id
+            SELECT * FROM Reservation WHERE reservation_id = :id
         ");
         $stmt->execute(['id' => $id]);
 
@@ -25,7 +25,7 @@ class ReservationRepository
     public function findByShow(int $showId): array
     {
         $stmt = $this->pdo->prepare("
-            SELECT * FROM ReservationTable WHERE show_id = :show_id
+            SELECT * FROM Reservation WHERE show_id = :show_id
         ");
         $stmt->execute(['show_id' => $showId]);
 
@@ -36,7 +36,7 @@ class ReservationRepository
     public function create(array $data): int
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO ReservationTable (
+            INSERT INTO Reservation (
                 show_id, 
                 user_id, 
                 status, 
@@ -59,26 +59,35 @@ class ReservationRepository
             'status'             => $data['status'],
             'ticket_amount'      => $data['ticket_amount'],
             'ticket_total_price' => $data['ticket_total_price'],
-            'duration'           => $data['duration']   // timestamp
+            'duration'           => $data['duration']   // count down time
         ]);
 
         return (int)$this->pdo->lastInsertId();
     }
 
+
     // Update reservation status
-    public function updateStatus(int $id, string $status): int
+    public function update(int $id, array $data): int
     {
         $stmt = $this->pdo->prepare("
-            UPDATE ReservationTable 
-            SET status = :status 
+            UPDATE Reservation 
+            SET status = :status,
+            show_id = :show_id,
+            user_id = :user_id,
+            ticket_amount = :ticket_amount,
+            ticket_total_price = :ticket_total_price,
+            duration = :duration
             WHERE reservation_id = :id
         ");
-
         $stmt->execute([
-            'status' => $status,
+            'status'             => $data['status'],
+            'show_id'            => $data['show_id'],
+            'user_id'            => $data['user_id'],
+            'ticket_amount'      => $data['ticket_amount'],
+            'ticket_total_price' => $data['ticket_total_price'],
+            'duration'           => $data['duration'],
             'id'     => $id
         ]);
-
         return $stmt->rowCount();
     }
 
@@ -86,7 +95,7 @@ class ReservationRepository
     public function delete(int $id): int
     {
         $stmt = $this->pdo->prepare("
-            DELETE FROM ReservationTable WHERE reservation_id = :id
+            DELETE FROM Reservation WHERE reservation_id = :id
         ");
         $stmt->execute(['id' => $id]);
 

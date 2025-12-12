@@ -1,25 +1,25 @@
 -- Payment
 INSERT INTO `Payment` (`reservation_id`, `payment_id`, `status`, `credit_number`, `credit_name`, `credit_expired_at`) VALUES
-(1, 11, 'cancelled', '4829173056218', 'Liam Carter', '2026-04-14'),
-(2, 9, 'pending', '7391058264410', 'Ava Mitchell', '2029-01-20'),
-(3, 6, 'completed', '5102987346629', 'Noah Benson', '2027-03-09'),
-(4, 8, 'cancelled', '9283745012365', 'Emma Reyes', '2026-06-09'),
-(5, 8, 'cancelled', '6039182754401', 'Mason Turner', '2028-01-12'),
-(6, 16, 'pending', '8172503694527', 'Chloe Anderson', '2025-12-12'),
-(7, 16, 'pending', '2947618305524', 'Ethan Collins', '2026-12-24'),
-(8, 19, 'cancelled', '5703492187603', 'Mia Lawson', '2026-06-09'),
-(9, 5, 'completed', '8602319475529', 'Lucas Rivera', '2028-01-12'),
-(10, 3, 'cancelled', '4318729501664', 'Lily Harper', '2026-06-09'),
-(11, 9, 'cancelled', '7925403168821', 'Oliver Brooks', '2026-03-02'),
-(12, 13, 'completed', '1568209735448', 'Zoe Ramirez', '2026-01-05'),
-(13, 16, 'completed', '9452176033810', 'Henry Kim', '2027-06-19'),
-(14, 20, 'cancelled', '3807621590446', 'Sofia Daniels', '2025-01-07'),
-(15, 11, 'completed', '2148957306623', 'Jack Morgan', '2029-01-03'),
-(16, 6, 'pending', '6735012849920', 'Aria Patel', '2025-11-19'),
-(17, 5, 'cancelled', '5089376217441', 'Leo Hughes', '2026-01-30'),
-(18, 9, 'completed', '3297604158825', 'Nora Sullivan', '2026-02-05'),
+(1, 1, 'confirmed', '4829173056218', 'Liam Carter', '2026-04-14'),
+(2, 2, 'pending', '7391058264410', 'Ava Mitchell', '2029-01-20'),
+(3, 3, 'completed', '5102987346629', 'Noah Benson', '2027-03-09'),
+(4, 4, 'cancelled', '9283745012365', 'Emma Reyes', '2026-06-09'),
+(5, 5, 'cancelled', '6039182754401', 'Mason Turner', '2028-01-12'),
+(6, 6, 'pending', '8172503694527', 'Chloe Anderson', '2025-12-12'),
+(7, 7, 'pending', '2947618305524', 'Ethan Collins', '2026-12-24'),
+(8, 8, 'cancelled', '5703492187603', 'Mia Lawson', '2026-06-09'),
+(9, 9, 'completed', '8602319475529', 'Lucas Rivera', '2028-01-12'),
+(10, 10, 'cancelled', '4318729501664', 'Lily Harper', '2026-06-09'),
+(11, 11, 'cancelled', '7925403168821', 'Oliver Brooks', '2026-03-02'),
+(12, 12, 'completed', '1568209735448', 'Zoe Ramirez', '2026-01-05'),
+(13, 13, 'completed', '9452176033810', 'Henry Kim', '2027-06-19'),
+(14, 14, 'cancelled', '3807621590446', 'Sofia Daniels', '2025-01-07'),
+(15, 15, 'completed', '2148957306623', 'Jack Morgan', '2029-01-03'),
+(16, 16, 'pending', '6735012849920', 'Aria Patel', '2025-11-19'),
+(17, 17, 'cancelled', '5089376217441', 'Leo Hughes', '2026-01-30'),
+(18, 18, 'completed', '3297604158825', 'Nora Sullivan', '2026-02-05'),
 (19, 19, 'completed', '7492016385428', 'Caleb Foster', '2026-04-09'),
-(20, 9, 'pending', '6018942377150', 'Isla Bennett', '2025-12-02');
+(20, 20, 'pending', '6018942377150', 'Isla Bennett', '2025-12-02');
 
 -- Reservation 
 
@@ -51,12 +51,12 @@ INSERT INTO `Reservation` (`reservation_id`, `show_id`, `user_id`, `status`, `ti
 
 INSERT INTO `Seat` (`reservation_id`, `seat_id`, `seat_number`, `seat_price`) VALUES
 (1, 1, 'A3', 150),
-(2, 2, 'F1', 150),
+(2, 2, 'F12', 150),
 (3, 3, 'A5', 300),
 (4, 4, 'A9', 150),
 (2, 5, 'F1', 150),
-(3, 6, 'A5', 300),
-(4, 7, 'A9', 150),
+(3, 6, 'F10', 300),
+(4, 7, 'B8', 150),
 (5, 8, 'A12', 150),
 (6, 9, 'B1', 150),
 (7, 10, 'H7', 150),
@@ -74,6 +74,6 @@ INSERT INTO `Seat` (`reservation_id`, `seat_id`, `seat_number`, `seat_price`) VA
 (14, 22, 'M1', 150),
 (14, 23, 'M2', 150),
 (14, 24, 'M3', 150),
-(14, 25, 'M4', 150);
+(1, 26, 'A4', 150);
 
 

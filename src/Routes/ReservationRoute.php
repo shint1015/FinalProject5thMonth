@@ -7,10 +7,9 @@ function ReservationRouter(string $pathInfo, string $method): array
     $controller = new ReservationController();
 
     $parts = explode('/', trim($pathInfo, '/'));
-    $resource = $parts[0] ?? null;
-    $id       = $parts[1] ?? null;   // reservation_id
-    $extra    = $parts[2] ?? null;
-
+    $resource = $parts[0] ?? null; // reservation
+    $id = $parts[1] ?? null; // reservation_id || show
+    $extra = $parts[2] ?? null; // show_id
     switch ($method) {
 
         case 'GET':
@@ -29,21 +28,21 @@ function ReservationRouter(string $pathInfo, string $method): array
         case 'POST':
             // POST /reservation
             if ($resource === 'reservation') {
-                return $controller->create();
+                return $controller->createReservation();
             }
             return [['error' => 'Not Found'], 404];
 
         case 'PUT':
 
-            // PUT /reservation/10/status
-            if ($resource === 'reservation' && is_numeric($id) && $extra === 'status') {
-                return $controller->updateStatus($id);
+            // PUT /reservation/10
+            if ($resource === 'reservation' && is_numeric($id)) {
+                return $controller->updateReservation($id);
             }
 
-            // PUT /reservation/10/duration
-            if ($resource === 'reservation' && is_numeric($id) && $extra === 'duration') {
-                return $controller->updateDuration($id);
-            }
+            // // PUT /reservation/10/duration
+            // if ($resource === 'reservation' && is_numeric($id) && $extra === 'duration') {
+            //     return $controller->updateDuration($id);
+            // }
 
             return [['error' => 'Not Found'], 404];
 
