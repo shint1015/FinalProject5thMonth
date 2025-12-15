@@ -1,10 +1,9 @@
 <?php
 require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
 
-use Middlewares\AuthMiddleware;
+use App\Middleware\AuthMiddleware;
 
 // Ensure all Venue endpoints require authentication
-AuthMiddleware::requireAuth();
 
 // Existing route handling continues below
 // ...
@@ -12,6 +11,11 @@ AuthMiddleware::requireAuth();
 include_once __DIR__ . '/../Controllers/VenueController.php';
 
 function VenueRouter(string $pathInfo, string $method): array {
+    
+    $protectedMethods = ['POST', 'PUT', 'DELETE'];
+    if (in_array($method, $protectedMethods, true)) {
+        AuthMiddleware::requireAdmin();
+    }
     $c = new VenueController();
     $parts = array_values(array_filter(explode('/', $pathInfo)));
     // paths: venue, venue/{id}

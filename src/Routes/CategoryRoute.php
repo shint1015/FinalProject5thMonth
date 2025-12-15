@@ -1,9 +1,16 @@
 <?php
 
 include_once __DIR__ . '/../Controllers/CategoryController.php';
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+
+use App\Middleware\AuthMiddleware;
 
 function CategoryRouter(string $pathInfo, string $method): array {
     $c = new CategoryController();
+    $protectedMethods = ['POST', 'PUT', 'DELETE'];
+    if (in_array($method, $protectedMethods, true)) {
+        AuthMiddleware::requireAdmin();
+    }
     $parts = array_values(array_filter(explode('/', $pathInfo)));
     if (($parts[0] ?? '') !== 'category') {
         return [["error" => "Not Found"], 404];

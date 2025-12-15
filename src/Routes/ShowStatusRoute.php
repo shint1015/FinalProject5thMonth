@@ -1,13 +1,19 @@
 <?php
+
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+use App\Middleware\AuthMiddleware;
+
 function ShowStatusRouter(string $pathInfo, string $method):array {
     include_once __DIR__ . '/../Controllers/ShowStatusController.php';
-    include_once __DIR__ . '/../Helpers/jwt.php';
-    include_once __DIR__ . '/../../config/env.php';
     $controller = new ShowStatusController();
 
     $pathParts = explode('/', $pathInfo);
     $resource = $pathParts[0] ?? '';
     $id = $pathParts[1] ?? '';
+    $protectedMethods = ['POST', 'PUT', 'DELETE'];
+    if (in_array($method, $protectedMethods, true)) {
+        AuthMiddleware::requireAdmin();
+    }
 
     switch ($method) {
         case 'GET':
@@ -17,20 +23,6 @@ function ShowStatusRouter(string $pathInfo, string $method):array {
                 return $controller->listStatuses();
             } else {
                 return [['error' => 'Not Found'], 404];
-            }
-            // Protected routes: require valid Bearer JWT
-            $protectedMethods = ['POST', 'PUT', 'DELETE'];
-            if (in_array($method, $protectedMethods, true)) {
-                $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-                if (!preg_match('/^Bearer\s+(\S+)/i', $authHeader, $m)) {
-                    return [["error" => "Unauthorized"], 401];
-                }
-                $token = $m[1];
-                $payload = jwt_decode($token, JWT_SECRET, 'HS256');
-                if ($payload === null) {
-                    return [["error" => "Unauthorized"], 401];
-                }
-                // Optionally use $payload['sub'] for auditing
             }
         
             case 'POST':
