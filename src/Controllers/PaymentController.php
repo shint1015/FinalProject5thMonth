@@ -13,11 +13,31 @@ class PaymentController
         $this->service = new PaymentService($repo);
     }
 
+    // reuse function
+
+    private function sanitizeString(string $value): string
+    {
+        return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+    }
+
+    private function validateInt($value): ?int
+    {
+        $int = filter_var($value, FILTER_VALIDATE_INT);
+        return $int !== false ? $int : null;
+    }
+
     // GET /payment/{id}
     public function showPayment(int $id): array
     {
-        $payment = $this->service->getPayment($id);
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid payment ID'
+            ], 400];
+        }
 
+        $payment = $this->service->getPayment($id);
         if (!$payment) {
             return [[
                 'success'=> false,
@@ -43,9 +63,17 @@ class PaymentController
         ], 200];
     }
 
-    // GET /payment/reservation/{id} (optional)
+    // GET /payment/reservation/{id} 
     public function listPaymentsByReservation(int $reservationId): array
     {
+        $reservationId = $this->validateInt($reservationId);
+        if ($reservationId === null) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid reservation ID'
+            ], 400];
+        }
+
         $list = $this->service->getPaymentsByReservation($reservationId);
         return [[
             'success' => true,
@@ -59,21 +87,45 @@ class PaymentController
     {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (!$data) {
+        if (!is_array($data)) {
             return [[
                 'success' => false,
                 'error' => 'Invalid JSON'
             ], 400];
         }
+        //sanitize
+        $reservationId = $this->validateInt($data['reservation_id'] ?? null);
+        $status        = $this->sanitizeString($data['status'] ?? '');
+        $creditNumber  = $this->sanitizeString($data['credit_number'] ?? '');
+        $creditName    = $this->sanitizeString($data['credit_name'] ?? '');
+        $creditExpire  = $this->sanitizeString($data['credit_expired_at'] ?? '');
 
-        $id = $this->service->createPayment($data);
+        if (empty($status)) {
+            return [[
+                'success' => false,
+                'error' => 'Status is required'
+            ], 400];
+        }
 
-        if ($id === 0) {
+        if (
+            $reservationId === null ||
+            empty($creditNumber) ||
+            empty($creditName) ||
+            empty($creditExpire)
+        ) {
             return [[
                 'success' => false,
                 'error' => 'Invalid payment data'
             ], 400];
         }
+
+        $id = $this->service->createPayment([
+            'reservation_id' => $reservationId,
+            'status' => $status,
+            'credit_number' => $creditNumber,
+            'credit_name' => $creditName,
+            'credit_expired_at' => $creditExpire
+        ]);
 
         return [[
             'success' => true,
@@ -85,11 +137,45 @@ class PaymentController
     // PUT /payment/{id}
     public function updatePayment(int $id): array
     {
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid payment ID'
+            ], 400];
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
-        if (!$data) {
+        if (!is_array($data)) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
+        }
+
+        //sanitize
+        $reservationId = $this->validateInt($data['reservation_id'] ?? null);
+        $status        = $this->sanitizeString($data['status'] ?? '');
+        $creditNumber  = $this->sanitizeString($data['credit_number'] ?? '');
+        $creditName    = $this->sanitizeString($data['credit_name'] ?? '');
+        $creditExpire  = $this->sanitizeString($data['credit_expired_at'] ?? '');
+
+        if (empty($status)) {
             return [[
                 'success' => false,
                 'error' => 'Status is required'
+            ], 400];
+        }
+
+        if (
+            $reservationId === null ||
+            empty($creditNumber) ||
+            empty($creditName) ||
+            empty($creditExpire)
+        ) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid payment data'
             ], 400];
         }
 
@@ -104,13 +190,21 @@ class PaymentController
 
         return [[
             'success' => true,
-            'message' => 'Status updated'
+            'message' => 'Payment updated'
         ], 200];
     }
 
     // DELETE /payment/{id}
     public function deletePayment(int $id): array
     {
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid payment ID'
+            ], 400];
+        }
+
         $deleted = $this->service->deletePayment($id);
 
         if ($deleted === 0) {
