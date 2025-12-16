@@ -2,6 +2,8 @@
 
 include_once __DIR__ . '/../Services/PaymentService.php';
 include_once __DIR__ . '/../../config/database.php';
+include_once __DIR__ . '/../Repositories/AuditRepository.php';
+include_once __DIR__ . '/../Services/AuditService.php';
 
 class PaymentController
 {
@@ -11,6 +13,9 @@ class PaymentController
     {
         $repo = new PaymentRepository(db());
         $this->service = new PaymentService($repo);
+        // for audit
+        $auditRepo = new AuditRepository(db());
+        $this->auditService = new AuditService($auditRepo);
     }
 
     // reuse function
@@ -119,13 +124,18 @@ class PaymentController
             ], 400];
         }
 
-        $id = $this->service->createPayment([
-            'reservation_id' => $reservationId,
-            'status' => $status,
-            'credit_number' => $creditNumber,
-            'credit_name' => $creditName,
-            'credit_expired_at' => $creditExpire
-        ]);
+        $id = $this->service->createPayment($data);
+
+        if ($id) {
+            $userId = $data['user_id'] ?? 1; //just add 1 to check
+            $this->auditService->log(
+                $userId,
+                'create',
+                'payment',
+                $id,
+                ['data' => $data]
+            );
+        }
 
         return [[
             'success' => true,
@@ -181,6 +191,17 @@ class PaymentController
 
         $updated = $this->service->updatePayment($id, $data);
 
+        if ($updated) {
+            $userId = $data['user_id'] ?? 1; //just add 1 to check
+            $this->auditService->log(
+                $userId,
+                'update',
+                'payment',
+                $id,
+                ['data' => $data]
+            );
+        }
+
         if ($updated === 0) {
             return [[
                 'success' => false,
@@ -204,8 +225,27 @@ class PaymentController
                 'error' => 'Invalid payment ID'
             ], 400];
         }
+        //check if have
+        $payment = $this->service->getPayment($id); 
+        if (!$payment) {
+            return [[
+                'success'=> false,
+                'error' => 'payment not found'
+            ], 404];
+        }
 
         $deleted = $this->service->deletePayment($id);
+
+        if ($deleted) {
+            $userId = $payment['user_id'] ?? 1; 
+            $this->auditService->log(
+                $userId,
+                'delete',
+                'payment',
+                $id,
+                ['data' => $payment]
+            );
+        }
 
         if ($deleted === 0) {
             return [[

@@ -2,18 +2,24 @@
 
 include_once __DIR__ . '/../Services/ReservationService.php';
 include_once __DIR__ . '/../../config/database.php';
+include_once __DIR__ . '/../Repositories/AuditRepository.php';
+include_once __DIR__ . '/../Services/AuditService.php';
 
 class ReservationController
 {
     private ReservationService $service;
+    private AuditService $auditService;
 
     public function __construct()
     {
         $repo = new ReservationRepository(db());
         $this->service = new ReservationService($repo);
+        // for audit
+        $auditRepo = new AuditRepository(db());
+        $this->auditService = new AuditService($auditRepo);
     }
 
-    // reuse function
+    // reuse function for sanitize
     private function sanitizeString(string $value): string
     {
         return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
@@ -109,6 +115,17 @@ class ReservationController
 
         $id = $this->service->createReservation($data);
 
+        if ($id) {
+            $userId = $data['user_id']; 
+            $this->auditService->log(
+                $userId,
+                'create',
+                'reservation',
+                $id,
+                ['data' => $data]
+            );
+        }
+
         return [[
             'success' => true,
             'reservation_id' => $id,
@@ -166,6 +183,17 @@ class ReservationController
         }
 
         $updated = $this->service->updateReservation($id, $data);
+
+        if ($updated) {
+            $userId = $data['user_id']; 
+            $this->auditService->log(
+                $userId,
+                'update',
+                'reservation',
+                $id,
+                ['data' => $data]
+            );
+        }
 
         if ($updated === 0) {
             return [[
@@ -232,8 +260,26 @@ class ReservationController
                 'error' => 'Invalid reservation ID'
             ], 400];
         }
+        //if don't have
+        $reservation = $this->service->getReservation($id);
+        if (!$reservation) {
+            return [[
+                'success' => false,
+                'error' => 'Reservation not found'
+            ], 404];
+        }
 
         $deleted = $this->service->deleteReservation($id);
+        if ($deleted) {
+            $userId = $reservation['user_id']; 
+            $this->auditService->log(
+                $userId,
+                'delete',
+                'reservation',
+                $id,
+                ['reservation' => $reservation]
+            );
+        }
 
         if ($deleted === 0) {
             return [[

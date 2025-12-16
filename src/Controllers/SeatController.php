@@ -2,6 +2,8 @@
 
 include_once __DIR__ . '/../Services/SeatService.php';
 include_once __DIR__ . '/../../config/database.php';
+include_once __DIR__ . '/../Repositories/AuditRepository.php';
+include_once __DIR__ . '/../Services/AuditService.php';
 
 class SeatController
 {
@@ -11,6 +13,9 @@ class SeatController
     {
         $repo = new SeatRepository(db());
         $this->service = new SeatService($repo);
+        // for audit
+        $auditRepo = new AuditRepository(db());
+        $this->auditService = new AuditService($auditRepo);
     }
 
     //reuse function
@@ -112,11 +117,18 @@ class SeatController
             ], 400];
         }
 
-        $id = $this->service->createSeat([
-            'reservation_id' => $reservationId,
-            'seat_number' => $seatNumber,
-            'seat_price' => $seatPrice
-        ]);
+        $id = $this->service->createSeat($data);
+
+        if ($id) {
+            $userId = $data['user_id'] ?? 1; //just add 1 to check
+            $this->auditService->log(
+                $userId,
+                'create',
+                'seat',
+                $id,
+                ['data' => $data]
+            );
+        }
 
         return [[
             'success'=> true,
@@ -164,6 +176,17 @@ class SeatController
 
         $updated = $this->service->updateSeat($id, $data);
 
+        if ($updated) {
+            $userId = $data['user_id'] ?? 1;; // just add 1 for check
+            $this->auditService->log(
+                $userId,
+                'update',
+                'seat',
+                $id,
+                ['data' => $data]
+            );
+        }
+
         if ($updated === 0) {
             return [[
                 'success'=> false,
@@ -187,8 +210,27 @@ class SeatController
                 'error' => 'Invalid seat ID'
             ], 400];
         }
+        //check if have
+        $seat = $this->service->getSeat($id); 
+        if (!$seat) {
+            return [[
+                'success'=> false,
+                'error' => 'Seat not found'
+            ], 404];
+        }
 
         $deleted = $this->service->deleteSeat($id);
+
+        if ($deleted) {
+            $userId = $seat['user_id'] ?? 1; 
+            $this->auditService->log(
+                $userId,
+                'delete',
+                'seat',
+                $id,
+                ['data' => $seat]
+            );
+        }
 
         if ($deleted === 0) {
             return [[
