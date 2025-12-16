@@ -54,6 +54,7 @@ class ReservationService
     // Update reservation status
     public function updateReservation(int $id, array $data): int
     {
+        var_dump($data);
         $allowed = ['pending', 'confirmed', 'cancelled'];
 
         foreach($data as $key => &$value){
