@@ -13,22 +13,42 @@ class SeatController
         $this->service = new SeatService($repo);
     }
 
+    //reuse function
+    private function sanitizeString(string $value): string
+    {
+        return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+    }
+
+    private function validateInt($value): ?int
+    {
+        $int = filter_var($value, FILTER_VALIDATE_INT);
+        return $int !== false ? $int : null;
+    }
+
     // GET /seat/{id}
     public function showSeat(int $id): array
     {
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success'=> false,
+                'error' => 'Invalid seat ID'
+            ], 400];
+        }
+
         $seat = $this->service->getSeat($id);
 
         if (!$seat) {
             return [[
-                'success'=> false,
-                'error' => 'Seat not found',
+                'success' => false,
+                'error' => "Seat not found"
             ], 404];
         }
 
         return [[
             'success'=> true,
-            'date' => $seat,
-            'message'=> "User's reservation"
+            'data' => $seat,
+            'message'=> "Seat details"
         ], 200];
     }
 
@@ -39,7 +59,7 @@ class SeatController
 
         return [[
             'success'=> true,
-            'date' => $list,
+            'data' => $list,
             'message'=> "User's list"
         ], 200];
     }
@@ -47,11 +67,19 @@ class SeatController
     // GET /seat/reservation/{id}
     public function listSeatsByReservation(int $reservationId): array
     {
+        $reservationId = $this->validateInt($reservationId);
+        if ($reservationId === null) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid reservation ID'
+            ], 400];
+        }
+
         $list = $this->service->getSeatsByReservation($reservationId);
 
         return [[
             'success'=> true,
-            'date' => $list,
+            'data' => $list,
             'message'=> "User's list"
         ], 200];
     }
@@ -61,21 +89,34 @@ class SeatController
     {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (!$data) {
+        if (!is_array($data)) {
             return [[
                 'success'=> false,
                 'error' => 'Invalid JSON'
             ], 400];
         }
-
-        $id = $this->service->createSeat($data);
-
-        if ($id === 0) {
+        //santisize
+        $reservationId = $this->validateInt($data['reservation_id'] ?? null);
+        $seatNumber    = $this->sanitizeString($data['seat_number'] ?? '');
+        $seatPrice     = $this->validateInt($data['seat_price'] ?? null);
+        
+        if (
+            $reservationId === null ||
+            empty($seatNumber) ||
+            $seatPrice === null ||
+            $seatPrice <= 0
+        ) {
             return [[
                 'success'=> false,
                 'error' => 'Invalid seat data'
             ], 400];
         }
+
+        $id = $this->service->createSeat([
+            'reservation_id' => $reservationId,
+            'seat_number' => $seatNumber,
+            'seat_price' => $seatPrice
+        ]);
 
         return [[
             'success'=> true,
@@ -87,12 +128,37 @@ class SeatController
     // PUT /seat/{id}
     public function updateSeat(int $id): array
     {
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success'=> false,
+                'error' => 'Invalid seat ID'
+            ], 400];
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
 
-        if (!$data) {
+        if (!is_array($data)) {
             return [[
                 'success'=> false,
                 'error' => 'Invalid JSON'
+            ], 400];
+        }
+
+        //santisize
+        $reservationId = $this->validateInt($data['reservation_id'] ?? null);
+        $seatNumber    = $this->sanitizeString($data['seat_number'] ?? '');
+        $seatPrice     = $this->validateInt($data['seat_price'] ?? null);
+        
+        if (
+            $reservationId === null ||
+            empty($seatNumber) ||
+            $seatPrice === null ||
+            $seatPrice <= 0
+        ) {
+            return [[
+                'success'=> false,
+                'error' => 'Invalid seat data'
             ], 400];
         }
 
@@ -114,6 +180,14 @@ class SeatController
     // DELETE /seat/{id}
     public function deleteSeat(int $id): array
     {
+        $id = $this->validateInt($id);
+        if ($id === null) {
+            return [[
+                'success'=> false,
+                'error' => 'Invalid seat ID'
+            ], 400];
+        }
+
         $deleted = $this->service->deleteSeat($id);
 
         if ($deleted === 0) {
