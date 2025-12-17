@@ -42,3 +42,4 @@ function ShowsRouter(string $pathInfo, string $method): array
             return [['error' => 'Method Not Allowed'], 405];
     }
 }
+?>

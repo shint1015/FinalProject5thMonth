@@ -16,7 +16,7 @@ switch ($method) {
     case 'POST':
         handlePost($pathInfo);
         break;
-    case 'PUT':
+    case 'PUT':                                              
         handlePut($pathInfo);
         break;
     case 'DELETE':
@@ -79,3 +79,4 @@ function handleDelete($pathInfo) {
         responseHandler(["error" => "Not Found"], 404);
     }
 }
+?>
