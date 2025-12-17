@@ -31,6 +31,16 @@ class ReservationController
         return $int !== false ? $int : null;
     }
 
+    private function validateDateTime($value, string $format = 'Y-m-d H:i:s'): ?DateTime
+    {
+        if (!$value) {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat($format, $value);
+        return ($date && $date->format($format) === $value) ? $date : null;
+    }
+
     // GET 
     public function getReservation(int $id): array
     {
@@ -88,10 +98,14 @@ class ReservationController
         $showId = $this->validateInt($data['show_id'] ?? null);
         $userId = $this->validateInt($data['user_id'] ?? null);
         $ticketAmount = $this->validateInt($data['ticket_amount'] ?? null);
-        $duration = $this->validateInt($data['duration'] ?? null);
+        // $duration = $this->validateInt($data['duration'] ?? null);
         $totalPrice = $this->validateInt($data['ticket_total_price'] ?? null);
         
         $status = $this->sanitizeString($data['status'] ?? '');
+        
+        $duration = $this->validateDateTime(
+            $this->sanitizeString($data['expires_at'] ?? '')
+    );
 
         if (empty($status)) {
             return [[
@@ -104,8 +118,8 @@ class ReservationController
             $showId === null ||
             $userId === null ||
             $ticketAmount === null ||
-            // $duration === null ||
-            $totalPrice === null
+            $totalPrice === null ||
+            $duration === null
         ){
             return [[
                 'success' => false,
@@ -157,10 +171,14 @@ class ReservationController
         $showId = $this->validateInt($data['show_id'] ?? null);
         $userId = $this->validateInt($data['user_id'] ?? null);
         $ticketAmount = $this->validateInt($data['ticket_amount'] ?? null);
-        $duration = $this->validateInt($data['duration'] ?? null);
+        // $duration = $this->validateInt($data['duration'] ?? null);
         $totalPrice = $this->validateInt($data['ticket_total_price'] ?? null);
 
         $status = $this->sanitizeString($data['status'] ?? '');
+
+        $duration = $this->validateDateTime(
+            $this->sanitizeString($data['expires_at'] ?? '')
+        );
 
         if (empty($status)) {
             return [[
@@ -173,8 +191,8 @@ class ReservationController
             $showId === null ||
             $userId === null ||
             $ticketAmount === null ||
-            // $duration === null ||
             $totalPrice === null
+            $duration === null
         ){
             return [[
                 'success' => false,
@@ -204,49 +222,7 @@ class ReservationController
 
         return [[
             'success' => true,
-            'message' => 'Status updated'
-        ], 200];
-    }
-
-    // PUT duration
-    public function updateDuration(int $id): array
-    {
-        $id = $this->validateInt($id);
-        if ($id === null) {
-            return [[
-                'success' => false,
-                'error' => 'Invalid reservation ID'
-            ], 400];
-        }
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        if (!is_array($data)) {
-            return [[
-                'success' => false,
-                'error' => 'Invalid JSON input'
-            ], 400];
-        }
-        $duration = $this->validateInt($data['duration'] ?? null);
-
-        if ($duration === null || $duration <= 0) {
-            return [[
-                'success' => false,
-                'error' => 'Valid duration is required'
-            ], 400];
-        }
-        
-        $updated = $this->service->updateDuration($id, $data['duration']);
-
-        if ($updated === 0) {
-            return [[
-                'success' => false,
-                'error' => 'Update failed'
-            ], 400];
-        }
-
-        return [[
-            'success' => true,
-            'message' => 'Duration updated'
+            'message' => 'Reservation updated'
         ], 200];
     }
 

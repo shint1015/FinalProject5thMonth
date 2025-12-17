@@ -1,0 +1,735 @@
+openapi: 3.1.0
+info:
+  title: Reservation API
+  version: 1.0.0
+  description: API to manage reservations and users
+
+servers:
+  - url: https://api.example.com
+    description: Production server
+
+# RESERVATION
+paths:
+  /reservation/{id}:
+    get:
+      summary: Get all reservations
+      description: Returns a list of all reservations
+      responses:
+        '200':
+          description: A JSON array of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetReservationRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetErrorRes'
+
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetErrorRes'
+
+    put:
+      summary: Update an existing reservation
+      description: Update an existing reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationInput'
+      responses:
+        '201':
+          description: Reservation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateReservationRes'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpdateErrorRes'    
+
+    delete:
+      summary: Delete a reservation
+      description: Delete a reservation
+      responses:
+        '200':
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteReservationRes'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeleteErrorRes'   
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeleteErrorRes'
+  /reservation:
+    post:
+      summary: Create a new reservation
+      description: Adds a new reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationInput'
+      responses:
+        '201':
+          description: Reservation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateReservationRes'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateErrorRes'
+# SEAT
+  /seat{id}:
+    get:
+      summary: Get user's seat
+      description: Returns a user's seat
+      responses:
+        '200':
+          description: A JSON array of seat
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetSeatRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatNotFound'
+
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetErrorSeat'
+
+    put:
+      summary: Update a seat
+      description: Update a seat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatInput'
+      responses:
+        '201':
+          description: Seat created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSeat'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpdateSeatError'    
+
+    delete:
+      summary: Delete a seat
+      description: Delete a seat
+      responses:
+        '200':
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteSeat'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeleteSeatError'   
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SeatNotFound'                
+  /seat:
+    post:
+      summary: Create a new seat
+      description: Adds a new seat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatInput'
+      responses:
+        '201':
+          description: Reservation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSeat'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateSeatError'
+
+# Payment
+  /payment{id}:
+    get:
+      summary: Get user's payment
+      description: Returns a user's payment
+      responses:
+        '200':
+          description: A JSON array of payment
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPaymentRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentNotFound'
+
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPaymentError'
+
+    put:
+      summary: Update a payment
+      description: Update a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePayment'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UpdatePaymentError'    
+
+    delete:
+      summary: Delete a payment
+      description: Delete a payment
+      responses:
+        '200':
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeletePayment'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeletePaymentError'   
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentNotFound'                
+  /payment:
+    post:
+      summary: Create a new payment
+      description: Adds a new payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePayment'
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatePaymentError'
+                  
+components:
+# RESERVATION
+  schemas:
+    GetReservationRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Reservation'
+        message:
+          type: string
+          example: "User's reservation"
+    
+    GetErrorRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid show ID"
+
+    CreateReservationRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        reservation_id:
+          type: integer
+          example: "12"
+        message:
+          type: string
+          example: "Reservation created"
+
+    CreateErrorRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid reservation data"
+
+    UpdateReservationRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Reservation updated"        
+
+    UpdateErrorRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Update failed"
+
+    DeleteReservationRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Reservation deleted"     
+
+    DeleteErrorRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Delete failed"
+
+    Reservation:
+      type: object
+      properties:
+        show_id:
+          type: integer
+          example: 12
+        ticket_amount:
+          type: integer
+          example: 2
+        ticket_total_price:
+          type: integer
+          example: 300
+        status:
+          type: string
+          enum: [Completed, Cancelled, Pending]
+        duration:
+          type: string
+          example: 2025-12-05 10:00:00
+
+    ReservationInput:
+      type: object
+      required:
+        - show_id
+        - ticket_amount
+        - ticket_total_price
+        - status
+        - duration
+      properties:
+        show_id:
+          type: integer
+          example: 3
+        ticket_amount:
+          type: integer
+          example: 1
+        ticket_total_price:
+          type: integer
+          example: 150
+        status:
+          type: string
+          enum: [Completed, Cancelled, Pending]
+          example: Completed
+        duration:
+          type: string
+          example: 2025-12-05 10:00:00
+
+# SEAT
+    GetSeatRes: 
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Seat'
+        message:
+          type: string
+          example: "User's seat"
+
+    GetErrorSeat:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid seat data"
+
+    SeatInput: 
+      type: object
+      properties:
+        reservation_id:
+          type: integer
+          example: 12
+        seat_number:
+          type: string
+          example: A5
+        seat_price:
+          type: integer
+          example: 150    
+
+    Seat:
+      type: object
+      properties:
+        reservation_id:
+          type: integer
+          example: 12
+        seat_id:
+          type: integer
+          example: 3
+        seat_number:
+          type: string
+          example: A5
+        seat_price:
+          type: integer
+          example: 150
+
+    CreateSeat:
+      type: object
+      properties:
+        success:
+          type: boolean
+        seat_id:
+          type: integer
+          example: "10"
+        message:
+          type: string
+          example: "Seat created"
+
+    CreateSeatError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid seat data"
+
+    UpdateSeat:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Seat updated"        
+
+    UpdateSeatError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Update failed"
+
+    DeleteSeat:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Seat deleted"     
+
+    DeleteSeatError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Delete failed"
+
+    SeatNotFound:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Seat Not Found"
+
+#PAYMENT
+    GetPaymentRes: 
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Payment'
+        message:
+          type: string
+          example: "User's payment"
+
+    GetPaymentError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid payment data"
+
+    PaymentInput: 
+      type: object
+      properties:
+        reservation_id:
+          type: integer
+          example: 12
+        credit_number:
+          type: string
+          example: 1234567890632
+        credit_name:
+          type: string
+          example: Shintaro Shin
+        credit_expired_at:
+          type: string
+          example: 2029-09-01
+        status: 
+          type: string
+          enum: [Completed, Cancelled, Pending]
+          example: Completed   
+
+    Payment:
+      type: object
+      properties:
+        payment_id:
+          type: integer
+          example: 2
+        reservation_id:
+          type: integer
+          example: 12
+        credit_number:
+          type: string
+          example: 1234567890632
+        credit_name:
+          type: string
+          example: Shintaro Shin
+        credit_expired_at:
+          type: string
+          example: 2029-09-01
+        status: 
+          type: string
+          enum: [Completed, Cancelled, Pending]
+          example: Completed          
+
+    CreatePayment:
+      type: object
+      properties:
+        reservation_id:
+          type: integer
+          example: 12
+        credit_number:
+          type: string
+          example: 1234567890632
+        credit_name:
+          type: string
+          example: Shintaro Shin
+        credit_expired_at:
+          type: string
+          example: 2029-09-01
+        status: 
+          type: string
+          enum: [Completed, Cancelled, Pending]
+          example: Completed          
+
+    CreatePaymentError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Invalid payment data"
+
+    UpdatePayment:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Payment updated"        
+
+    UpdatePaymentError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Update failed"
+
+    DeletePayment:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: "Payment deleted"     
+
+    DeletePaymentError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Delete failed"
+
+    PaymentNotFound:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: "Payment Not Found"
