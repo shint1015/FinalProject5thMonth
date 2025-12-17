@@ -57,3 +57,4 @@ class ShowsController
         return [['data' => ['show_id' => $newId]], 201];
     }
 }
+?>
