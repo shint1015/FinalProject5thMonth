@@ -1,9 +1,10 @@
 <?php
 ini_set("display_errors", 1);
-// include __DIR__ ."/config/env.php";
-// include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
-// include_once __DIR__ . '/src/Routes/ShowsRoute.php';
-require_once __DIR__ . "/src/Routes/ShowsRoute.php";
+include __DIR__ ."/config/env.php";
+include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
+include_once __DIR__ . '/src/Routes/ShowsRoute.php';
+
+
 
 
 $method = $_SERVER["REQUEST_METHOD"];
