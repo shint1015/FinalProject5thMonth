@@ -1285,14 +1285,11 @@ components:
                     type: string
                     example: newuser@example.com
                 first_name:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 last_name:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 display_name:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 role:
                     type: string
                     enum: [admin, general]
@@ -1311,8 +1308,7 @@ components:
                     enum: [admin, general]
                     example: general
                 display_name:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
 
         AuthLogoutRes:
             type: object
@@ -1430,18 +1426,14 @@ components:
                     type: integer
                     example: 1200
                 seat_id_format:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                     example: TGH-{ROW}-{SEAT}
                 notes:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 layout:
-                    type: object
-                    nullable: true
+                    type: [object, 'null']
                 address:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 created_at:
                     type: string
                     example: 2025-12-18 12:00:00
@@ -1462,18 +1454,14 @@ components:
                     type: integer
                     example: 1200
                 seat_id_format:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                     example: TGH-{ROW}-{SEAT}
                 notes:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 layout:
-                    type: object
-                    nullable: true
+                    type: [object, 'null']
                 address:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
 
         VenueUpdateInput:
             type: object
@@ -1483,17 +1471,13 @@ components:
                 capacity:
                     type: integer
                 seat_id_format:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 notes:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
                 layout:
-                    type: object
-                    nullable: true
+                    type: [object, 'null']
                 address:
-                    type: string
-                    nullable: true
+                    type: [string, 'null']
 
         VenueListRes:
             type: object
