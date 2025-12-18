@@ -37,5 +37,41 @@ class ShowsRepository
 
         return $ok ? (int)$this->db->lastInsertId() : 0;
     }
+    public function update(int $id, array $data): bool
+{
+    if (empty($data)) {
+        return false;
+    }
+
+    $fields = [];
+    $values = [];
+
+    foreach ($data as $key => $value) {
+        $fields[] = "$key = ?";
+        $values[] = $value;
+    }
+
+    // WHERE id = ?
+    $values[] = $id;
+
+    $sql = "UPDATE shows SET " . implode(', ', $fields) . " WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+
+
+    return $stmt->execute($values);
+}
+
+public function deleteById(int $id): bool
+{
+    $stmt = $this->db->prepare(
+        "DELETE FROM shows WHERE id = ?"
+    );
+
+    $stmt->execute([$id]);
+
+    // confirm deletion
+    return $stmt->rowCount() > 0;
+}
+
 }
 ?>

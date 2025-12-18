@@ -1,7 +1,9 @@
 <?php
 ini_set("display_errors", 1);
-include __DIR__ ."/config/env.php";
-include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
+require_once __DIR__ . '/config/env.php';
+require_once __DIR__ . '/config/database.php';
+
+// include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
 include_once __DIR__ . '/src/Routes/ShowsRoute.php';
 
 
@@ -35,6 +37,7 @@ function responseHandler($data, $code) {
 
 // Handlers for GET requests
 function handleGet($pathInfo) {
+    
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "GET");
         responseHandler(...$response);
@@ -65,19 +68,36 @@ function handlePost($pathInfo) {
 
 // Handlers for PUT requests
 function handlePut($pathInfo) {
-    if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
-        ShowStatusRouter($pathInfo, "PUT");
+    if (str_contains($pathInfo, 'show_status')) {
+        $response = ShowStatusRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+
+    } else if (str_contains($pathInfo, 'shows')) {
+        $response = ShowsRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
 }
 
+
+
+
 // Handlers for DELETE requests
-function handleDelete($pathInfo) {
-    if ($pathInfo === 'show_status' || $pathInfo === 'show_status/list') {
-        ShowStatusRouter($pathInfo, "DELETE");
+function handleDelete($pathInfo)
+{
+    if (str_contains($pathInfo, 'show_status')) {
+        $response = ShowStatusRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+
+    } else if (str_contains($pathInfo, 'shows')) {
+        $response = ShowsRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
 }
+
 ?>
