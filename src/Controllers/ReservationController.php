@@ -190,7 +190,7 @@ class ReservationController
             $showId === null ||
             $userId === null ||
             $ticketAmount === null ||
-            $totalPrice === null
+            $totalPrice === null ||
             $duration === null
         ){
             return [[
