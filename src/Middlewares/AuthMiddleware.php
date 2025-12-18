@@ -21,13 +21,6 @@ class AuthMiddleware
             }
         }
 
-        $sessionUser = $_SESSION['user'] ?? null;
-        if (is_array($sessionUser) && !empty($sessionUser['user_id'])) {
-            $_SERVER['AUTH_USER_ID'] = $sessionUser['user_id'];
-            $_SERVER['AUTH_USER_ROLE'] = $sessionUser['role'] ?? null;
-            return;
-        }
-
         // 2) JWT auth (API clients)
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         $secret = defined('JWT_SECRET') ? JWT_SECRET : 'change-me';
@@ -38,6 +31,13 @@ class AuthMiddleware
                 self::deny('Missing or invalid Authorization header');
             }
             self::deny('Invalid or expired token');
+        }
+
+        $sessionUser = $_SESSION['user'] ?? null;
+        if (is_array($sessionUser) && !empty($sessionUser['user_id'])) {
+            $_SERVER['AUTH_USER_ID'] = $sessionUser['user_id'];
+            $_SERVER['AUTH_USER_ROLE'] = $sessionUser['role'] ?? null;
+            return;
         }
 
         // Context from JWT

@@ -46,7 +46,7 @@ class VenueRepository {
             }
         }
         if (empty($sets)) return null;
-        $sql = 'UPDATE venues SET ' . implode(', ', $sets) . ' WHERE id = :id';
+        $sql = 'UPDATE venues SET ' . implode(', ', $sets) . ' WHERE venue_id = :venue_id';
         $stmt = $this->pdo->prepare($sql);
         if (!$stmt->execute($params)) return null;
         return $this->find($venue_id);

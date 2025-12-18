@@ -27,15 +27,22 @@ class VenueController {
     }
 
     public function create(): array {
+        $json_data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($json_data)) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
+        }
+
         $data = [
-            'name' => trim(htmlspecialchars((string)($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8')),
-            'capacity' => (int)($_POST['capacity'] ?? 0),
-            'seat_id_format' => isset($_POST['seat_id_format']) ? htmlspecialchars($_POST['seat_id_format'], ENT_QUOTES, 'UTF-8') : null,
-            'notes' => isset($_POST['notes']) ? htmlspecialchars($_POST['notes'], ENT_QUOTES, 'UTF-8') : null,
-            'layout' => $_POST['layout'] ?? null,
-            'address' => isset($_POST['address']) ? htmlspecialchars($_POST['address'], ENT_QUOTES, "UTF-8") : null,
+            'name' => trim(htmlspecialchars((string)($json_data['name'] ?? ''), ENT_QUOTES, 'UTF-8')),
+            'capacity' => (int)($json_data['capacity'] ?? 0),
+            'seat_id_format' => isset($json_data['seat_id_format']) ? htmlspecialchars($json_data['seat_id_format'], ENT_QUOTES, 'UTF-8') : null,
+            'notes' => isset($json_data['notes']) ? htmlspecialchars($json_data['notes'], ENT_QUOTES, 'UTF-8') : null,
+            'layout' => $json_data['layout'] ?? null,
+            'address' => isset($json_data['address']) ? htmlspecialchars($json_data['address'], ENT_QUOTES, "UTF-8") : null,
         ];
-        var_dump($data);
         if ($data['name'] === '' || $data['capacity'] <= 0) {
             return [["success" => false, "error" => "name and positive capacity are required"], 400];
         }
@@ -45,12 +52,19 @@ class VenueController {
     }
 
     public function update(int $id): array {
+        $json_data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($json_data)) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
+        }
         $fields = [];
         foreach (['name','capacity','seat_id_format','notes','layout', 'address'] as $k) {
-            if (isset($_POST[$k])) {
+            if (isset($json_data[$k])) {
                 $fields[$k] = in_array($k, ['seat_id_format','notes','name'])
-                    ? htmlspecialchars((string)$_POST[$k], ENT_QUOTES, 'UTF-8')
-                    : $_POST[$k];
+                    ? htmlspecialchars((string)$json_data[$k], ENT_QUOTES, 'UTF-8')
+                    : $json_data[$k];
             }
         }
         if (empty($fields)) return [["success" => false, "error" => "no fields"], 400];

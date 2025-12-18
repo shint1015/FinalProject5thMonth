@@ -27,19 +27,32 @@ class CategoryController {
     }
 
     public function create(): array {
-        
-        $name = trim(htmlspecialchars((string)($_POST['category_name'] ?? ''), ENT_QUOTES, 'UTF-8'));
-        $sort = (int)($_POST['sort'] ?? 0);
+        $json_data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($json_data)) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
+        }
+        $name = trim(htmlspecialchars((string)($json_data['category_name'] ?? ''), ENT_QUOTES, 'UTF-8'));
+        $sort = (int)($json_data['sort'] ?? 0);
         if ($name === '') return [["success" => false, "error" => "category_name required"], 400];
         $created = $this->service->create($name, $sort);
         if (!$created) return [["success" => false, "error" => "Category not created"], 400];
-        return [["success" => true, "message" => "Category updated successfully"], 201];
+        return [["success" => true, "message" => "Category created successfully"], 201];
     }
 
     public function update(int $id): array {
+        $json_data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($json_data)) {
+            return [[
+                'success' => false,
+                'error' => 'Invalid JSON'
+            ], 400];
+        }
         $fields = [];
-        if (isset($_POST['category_name'])) $fields['category_name'] = htmlspecialchars((string)$_POST['category_name'], ENT_QUOTES, 'UTF-8');
-        if (isset($_POST['sort'])) $fields['sort'] = (int)$_POST['sort'] ?? "";
+        if (isset($json_data['category_name'])) $fields['category_name'] = htmlspecialchars((string)$json_data['category_name'], ENT_QUOTES, 'UTF-8');
+        if (isset($json_data['sort'])) $fields['sort'] = (int)$json_data['sort'] ?? "";
         if (empty($fields)) return [["success" => false, "error" => "no fields"], 400];
         $updated = $this->service->update($id, $fields);
         if (!$updated) return [["error" => "Category not found or not updated"], 404];
