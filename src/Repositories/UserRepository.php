@@ -11,7 +11,7 @@ class UserRepository {
      * Find a user by email (primary identifier in schema).
      */
     public function findByEmail(string $email): ?array {
-        $stmt = $this->pdo->prepare('SELECT id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE email = :email LIMIT 1');
+        $stmt = $this->pdo->prepare('SELECT user_id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE email = :email LIMIT 1');
         $stmt->execute([':email' => $email]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
@@ -27,13 +27,13 @@ class UserRepository {
     /**
      * Find a user by id.
      */
-    public function findById(int $id): ?array {
-        $stmt = $this->pdo->prepare('SELECT id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute([':id' => $id]);
+    public function findById(int $user_id): ?array {
+        $stmt = $this->pdo->prepare('SELECT user_id, email, first_name, last_name, display_name, password, role, created_at, updated_at FROM users WHERE user_id = :user_id LIMIT 1');
+        $stmt->execute([':user_id' => $user_id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
-
+    
     /**
      * Create a new user. Defaults role to 'general'.
      */
@@ -57,10 +57,10 @@ class UserRepository {
     /**
      * Update fields on a user. Allowed: email, password, first_name, last_name, display_name, role
      */
-    public function update(int $id, array $fields): ?array {
+    public function update(int $user_id, array $fields): ?array {
         $allowed = ['email', 'password', 'first_name', 'last_name', 'display_name', 'role'];
         $sets = [];
-        $params = [':id' => $id];
+        $params = [':user_id' => $user_id];
         foreach ($allowed as $key) {
             if (array_key_exists($key, $fields)) {
                 $sets[] = "$key = :$key";
@@ -70,16 +70,16 @@ class UserRepository {
         if (empty($sets)) {
             return null;
         }
-        $sql = 'UPDATE users SET ' . implode(', ', $sets) . ' WHERE id = :id';
+        $sql = 'UPDATE users SET ' . implode(', ', $sets) . ' WHERE user_id = :user_id';
         $stmt = $this->pdo->prepare($sql);
         if (!$stmt->execute($params)) {
             return null;
         }
-        return $this->findById($id);
+        return $this->findById($user_id);
     }
 
-    public function delete(int $id): bool {
-        $stmt = $this->pdo->prepare('DELETE FROM users WHERE id = :id');
-        return $stmt->execute([':id' => $id]);
+    public function delete(int $user_id): bool {
+        $stmt = $this->pdo->prepare('DELETE FROM users WHERE user_id = :user_id');
+        return $stmt->execute([':user_id' => $user_id]);
     }
 }

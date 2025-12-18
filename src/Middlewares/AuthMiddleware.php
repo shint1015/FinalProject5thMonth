@@ -2,10 +2,15 @@
 // src/Middlewares/AuthMiddleware.php
 namespace App\Middleware;
 
+include_once __DIR__ . '/../Helpers/jwt.php';
+include_once __DIR__ . '/../../config/env.php';
+
 class AuthMiddleware
 {
     /**
-     * Require a valid Authorization header (Bearer token) and exit with 401 JSON on failure.
+     * Require authentication.
+     * - Session-based: expects `$_SESSION['user']` set by login.
+     * - JWT-based: expects `Authorization: Bearer <jwt>`.
      */
     public static function requireAuth(): void
     {
@@ -15,25 +20,30 @@ class AuthMiddleware
                 @session_start();
             }
         }
-        $sessionUserId = $_SESSION['user_id'] ?? null;
-        if ($sessionUserId) {
-            $_SERVER['AUTH_USER_ID'] = $sessionUserId;
+
+        $sessionUser = $_SESSION['user'] ?? null;
+        if (is_array($sessionUser) && !empty($sessionUser['user_id'])) {
+            $_SERVER['AUTH_USER_ID'] = $sessionUser['user_id'];
+            $_SERVER['AUTH_USER_ROLE'] = $sessionUser['role'] ?? null;
             return;
         }
 
-        // 2) Bearer token auth (API clients)
+        // 2) JWT auth (API clients)
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
-            self::deny('Missing or invalid Authorization header');
-        }
-        $token = $matches[1] ?? '';
-        $validToken = getenv('API_BEARER_TOKEN') ?: 'my-secret-token';
-        if ($token !== $validToken) {
-            self::deny('Invalid token');
+        $secret = defined('JWT_SECRET') ? JWT_SECRET : 'change-me';
+        $payload = jwt_check_bearer($authHeader, $secret, 'HS256');
+        if ($payload === null) {
+            // Differentiate missing header vs invalid token
+            if (!preg_match('/^Bearer\s+.+$/i', trim($authHeader))) {
+                self::deny('Missing or invalid Authorization header');
+            }
+            self::deny('Invalid or expired token');
         }
 
-        // Optional: context for token users
-        $_SERVER['AUTH_USER_ID'] = $_SERVER['AUTH_USER_ID'] ?? 'token-user';
+        // Context from JWT
+        $_SERVER['AUTH_JWT_PAYLOAD'] = $payload;
+        $_SERVER['AUTH_USER_ID'] = $payload['sub'] ?? 'jwt-user';
+        $_SERVER['AUTH_USER_ROLE'] = $payload['role'] ?? null;
     }
 
     /**
@@ -75,18 +85,9 @@ class AuthMiddleware
         self::requireAuth();
 
         // Session-based role check
-        $role = $_SESSION['role'] ?? null;
+        $role = $_SESSION['user']['role'] ?? ($_SERVER['AUTH_USER_ROLE'] ?? null);
         if ($role === 'admin') {
             return;
-        }
-
-        // Token-based admin override: if bearer matches admin token
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        $adminToken = getenv('API_ADMIN_TOKEN') ?: null;
-        if ($adminToken && preg_match('/^Bearer\s+(.+)$/i', $authHeader, $m)) {
-            if (($m[1] ?? '') === $adminToken) {
-                return;
-            }
         }
 
         self::deny('Admin privileges required', 403);

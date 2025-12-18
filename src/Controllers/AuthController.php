@@ -33,9 +33,14 @@ class AuthController {
 
 		$now = time();
 		$exp = $now + 3600; // 1 hour
+		$subject = $user['user_id'] ?? ($user['id'] ?? null);
+		if ($subject === null || $subject === '') {
+			$subject = $username;
+		}
 		$payload = [
-			'sub' => (string)($user['id'] ?? $username),
+			'sub' => (string)$subject,
 			'username' => $user['username'] ?? $username,
+			'role' => $user['role'] ?? 'general',
 			'iat' => $now,
 			'exp' => $exp,
 		];
@@ -44,11 +49,10 @@ class AuthController {
 		$secret = defined('JWT_SECRET') ? JWT_SECRET : 'change-me';
 
 		$token = jwt_encode($payload, $secret, 'HS256');
-		echo session_status() === PHP_SESSION_ACTIVE ? "TRUE" : "FALSE" . "<br>";
 		// Store minimal profile in session for session-based auth
 		if (session_status() === PHP_SESSION_ACTIVE) {
 			$_SESSION['user'] = [
-				'id' => $user['id'] ?? null,
+				'user_id' => $user['user_id'] ?? null,
 				'email' => $user['email'] ?? ($user['username'] ?? $username),
 				'role' => $user['role'] ?? 'general',
 				'display_name' => $user['display_name'] ?? null,
@@ -99,7 +103,7 @@ class AuthController {
 		}
 		// Do not return password hash
 		return [[
-			'id' => $created['id'],
+			'user_id' => $created['user_id'],
 			'email' => $created['email'] ?? $email,
 			'first_name' => $created['first_name'] ?? $firstName,
 			'last_name' => $created['last_name'] ?? $lastName,

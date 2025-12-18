@@ -35,6 +35,7 @@ class VenueController {
             'layout' => $_POST['layout'] ?? null,
             'address' => isset($_POST['address']) ? htmlspecialchars($_POST['address'], ENT_QUOTES, "UTF-8") : null,
         ];
+        var_dump($data);
         if ($data['name'] === '' || $data['capacity'] <= 0) {
             return [["success" => false, "error" => "name and positive capacity are required"], 400];
         }

@@ -81,7 +81,7 @@ class UserService {
      * Update user fields. Allowed keys: username, password.
      * Returns updated user row or null if not found/failure.
      */
-    public function updateUser(int $id, array $fields): ?array
+    public function updateUser(int $user_id, array $fields): ?array
     {
         // Sanitize and hash if provided, delegate to repository
         $update = [];
@@ -98,15 +98,15 @@ class UserService {
         if (empty($update)) {
             return null;
         }
-        return $this->repo->update($id, $update);
+        return $this->repo->update($user_id, $update);
     }
 
     /**
      * Delete user by id. Returns true on success.
      */
-    public function deleteUser(int $id): bool
+    public function deleteUser(int $user_id): bool
     {
-        return $this->repo->delete($id);
+        return $this->repo->delete($user_id);
     }
 
     /**
@@ -146,9 +146,9 @@ class UserService {
     }
 
     /** Convenience: role check by id */
-    public function isAdminById(int $id): bool
+    public function isAdminById(int $user_id): bool
     {
-        $u = $this->repo->findById($id);
+        $u = $this->repo->findById($user_id);
         return $u ? $this->isAdmin($u) : false;
     }
 

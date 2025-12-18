@@ -81,3 +81,20 @@ function jwt_decode(string $jwt, string $secret, string $alg = 'HS256'): ?array
 
     return $payload;
 }
+
+/**
+ * Validate an Authorization header containing a Bearer JWT.
+ * Returns the decoded payload if valid (signature verified and not expired), otherwise null.
+ */
+function jwt_check_bearer(string $authorizationHeader, string $secret, string $alg = 'HS256'): ?array
+{
+    $authorizationHeader = trim($authorizationHeader);
+    if (!preg_match('/^Bearer\s+(.+)$/i', $authorizationHeader, $matches)) {
+        return null;
+    }
+    $token = trim($matches[1] ?? '');
+    if ($token === '') {
+        return null;
+    }
+    return jwt_decode($token, $secret, $alg);
+}
