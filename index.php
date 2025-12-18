@@ -63,7 +63,6 @@ function responseHandler($data, $code) {
 
 // Handlers for GET requests
 function handleGet($pathInfo) {
-    var_dump($pathInfo);
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "GET");
         responseHandler(...$response);

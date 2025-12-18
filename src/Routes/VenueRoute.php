@@ -23,7 +23,6 @@ function VenueRouter(string $pathInfo, string $method): array {
         return [["error" => "Not Found"], 404];
     }
     $id = isset($parts[1]) ? (int)$parts[1] : null;
-    var_dump($id);
     if ($method === 'GET') {
         if ($id) return $c->show($id);
         return $c->list();
