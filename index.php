@@ -1,4 +1,8 @@
 <?php
+// Start session early for session-based auth
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 
@@ -9,6 +13,9 @@ include_once __DIR__ . '/src/Routes/ReservationRoute.php';
 include_once __DIR__ . '/src/Routes/PaymentRoute.php';
 include_once __DIR__ . '/src/Routes/SeatRoute.php';
 require_once __DIR__ . '/src/Helpers/AppLogger.php';
+include_once __DIR__ . '/src/Routes/AuthRoute.php';
+include_once __DIR__ . '/src/Routes/VenueRoute.php';
+include_once __DIR__ . '/src/Routes/CategoryRoute.php';
 
 // appLog is provided by Helpers\AppLogger
 
@@ -68,6 +75,15 @@ function handleGet($pathInfo) {
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "GET");
         responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'GET');
+        responseHandler(...$response);
+    } else if ($pathInfo === 'venue' || preg_match('#^venue/\d+$#', $pathInfo)) {
+        $response = VenueRouter($pathInfo, 'GET');
+        responseHandler(...$response);
+    } else if ($pathInfo === 'category' || preg_match('#^category/\d+$#', $pathInfo)) {
+        $response = CategoryRouter($pathInfo, 'GET');
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
@@ -87,9 +103,19 @@ function handlePost($pathInfo) {
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "POST");
         responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'POST');
+        responseHandler(...$response);
+    } else if ($pathInfo === 'venue') {
+        $response = VenueRouter($pathInfo, 'POST');
+        responseHandler(...$response);
+    } else if ($pathInfo === 'category') {
+        $response = CategoryRouter($pathInfo, 'POST');
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
+
 }
 
 // Handlers for PUT requests
@@ -106,9 +132,19 @@ function handlePut($pathInfo) {
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "PUT");
         responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'PUT');
+        responseHandler(...$response);
+    } else if (preg_match('#^venue/\d+$#', $pathInfo)) {
+        $response = VenueRouter($pathInfo, 'PUT');
+        responseHandler(...$response);
+    } else if (preg_match('#^category/\d+$#', $pathInfo)) {
+        $response = CategoryRouter($pathInfo, 'PUT');
+        responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
+
 }
 
 // Handlers for DELETE requests
@@ -124,6 +160,15 @@ function handleDelete($pathInfo) {
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'seat')) {
         $response = SeatRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    }else if (str_contains($pathInfo, 'auth')) {
+        $response = AuthRouter($pathInfo, 'DELETE');
+        responseHandler(...$response);
+    } else if (preg_match('#^venue/\d+$#', $pathInfo)) {
+        $response = VenueRouter($pathInfo, 'DELETE');
+        responseHandler(...$response);
+    } else if (preg_match('#^category/\d+$#', $pathInfo)) {
+        $response = CategoryRouter($pathInfo, 'DELETE');
         responseHandler(...$response);
     } else {
         responseHandler(["error" => "Not Found"], 404);

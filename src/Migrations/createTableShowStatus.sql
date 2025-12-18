@@ -1,4 +1,4 @@
-CREATE TABLE show_status (
+CREATE TABLE IF NOT EXISTS show_status (
     id INT AUTO_INCREMENT PRIMARY KEY,
     status VARCHAR(255) NOT NULL,
     sort INT DEFAULT 0,

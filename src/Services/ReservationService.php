@@ -44,17 +44,9 @@ class ReservationService
         return $this->repo->create($data);
     }
 
-    //count down
-    public function updateDuration(int $id, string $duration): int
-    {
-    if ($id <= 0 || empty($duration)) return 0;
-    return $this->repo->updateDuration($id, $duration);
-    }
-
     // Update reservation status
     public function updateReservation(int $id, array $data): int
     {
-        var_dump($data);
         $allowed = ['pending', 'confirmed', 'cancelled'];
 
         foreach($data as $key => &$value){

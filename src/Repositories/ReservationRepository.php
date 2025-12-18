@@ -80,7 +80,6 @@ class ReservationRepository
             WHERE reservation_id = :id
         ");
 
-        var_dump($data);
         $stmt->execute([
             'status'             => $data['status'],
             'show_id'            => $data['show_id'],
