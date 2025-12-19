@@ -6,7 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 
-include __DIR__ ."/config/env.php";
+include_once __DIR__ ."/config/env.php";
+require_once __DIR__ . '/config/database.php';
 include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
 include_once __DIR__ . '/src/Routes/ShowStatusRoute.php';
 include_once __DIR__ . '/src/Routes/ReservationRoute.php';
@@ -16,6 +17,7 @@ require_once __DIR__ . '/src/Helpers/AppLogger.php';
 include_once __DIR__ . '/src/Routes/AuthRoute.php';
 include_once __DIR__ . '/src/Routes/VenueRoute.php';
 include_once __DIR__ . '/src/Routes/CategoryRoute.php';
+include_once __DIR__ . '/src/Routes/ShowsRoute.php';
 
 // appLog is provided by Helpers\AppLogger
 
@@ -60,11 +62,14 @@ function responseHandler($data, $code) {
     echo json_encode($data);
 }
 
-
 // Handlers for GET requests
 function handleGet($pathInfo) {
+    
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "GET");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'shows')) {
+        $response = ShowsRouter($pathInfo, "GET");
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "GET");
@@ -94,6 +99,9 @@ function handlePost($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "POST");
         responseHandler(...$response);
+    } else if ($pathInfo === 'shows') {
+        $response = ShowsRouter($pathInfo, "POST");
+        responseHandler(...$response);
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "POST");
         responseHandler(...$response);
@@ -118,11 +126,17 @@ function handlePost($pathInfo) {
 
 }
 
+
 // Handlers for PUT requests
 function handlePut($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "PUT");
         responseHandler(...$response);
+
+    } else if (str_contains($pathInfo, 'shows')) {
+        $response = ShowsRouter($pathInfo, "PUT");
+        responseHandler(...$response);
+
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "PUT");
         responseHandler(...$response);
@@ -144,13 +158,18 @@ function handlePut($pathInfo) {
     } else {
         responseHandler(["error" => "Not Found"], 404);
     }
-
 }
+
+
+
 
 // Handlers for DELETE requests
 function handleDelete($pathInfo) {
     if (str_contains($pathInfo, 'show_status')) {
         $response = ShowStatusRouter($pathInfo, "DELETE");
+        responseHandler(...$response);
+    } else if (str_contains($pathInfo, 'shows')) {
+        $response = ShowsRouter($pathInfo, "DELETE");
         responseHandler(...$response);
     } else if (str_contains($pathInfo, 'reservation')) {
         $response = ReservationRouter($pathInfo, "DELETE");
@@ -174,3 +193,5 @@ function handleDelete($pathInfo) {
         responseHandler(["error" => "Not Found"], 404);
     }
 }
+
+?>

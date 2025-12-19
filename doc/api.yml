@@ -1,0 +1,303 @@
+openapi: 3.1.0
+info:
+  title: Shows API
+  version: 1.0.0
+  description: API to manage shows (events)
+
+servers:
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /shows:
+    get:
+      summary: Get all shows
+      description: Returns a list of all shows
+      responses:
+        '200':
+          description: A JSON array of shows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetShowRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetShowError'
+
+    post:
+      summary: Create a new show
+      description: Adds a new show
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShowInput'
+      responses:
+        '201':
+          description: Show created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateShowRes'
+
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateShowError'
+
+  /shows/{id}:
+    get:
+      summary: Get show detail
+      description: Returns a show by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Show detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetShowRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetShowError'
+
+    put:
+      summary: Update a show
+      description: Update an existing show
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShowInput'
+      responses:
+        '200':
+          description: Show updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateShowRes'
+
+        '400':
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateShowError'
+
+    delete:
+      summary: Delete a show
+      description: Delete a show by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteShowRes'
+
+        '404':
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteShowError'
+
+components:
+  schemas:
+    Show:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Rock Legends Live
+        description:
+          type: string
+          example: Live rock concert
+        category:
+          type: string
+          example: Music
+        date:
+          type: string
+          example: 2025-12-20
+        start_time:
+          type: string
+          example: 19:00
+        end_time:
+          type: string
+          example: 22:00
+        venue:
+          type: string
+          example: Downtown Arena
+        city:
+          type: string
+          example: Vancouver
+        price:
+          type: integer
+          example: 89
+        thumbnail:
+          type: string
+          example: /images/rock.jpg
+        capacity:
+          type: integer
+          example: 5000
+        available_tickets:
+          type: integer
+          example: 3000
+        status:
+          type: string
+          enum: [available, sold_out, cancelled]
+
+    ShowInput:
+      type: object
+      required:
+        - title
+        - date
+        - start_time
+        - end_time
+        - price
+        - capacity
+        - available_tickets
+        - status
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        date:
+          type: string
+        start_time:
+          type: string
+        end_time:
+          type: string
+        venue:
+          type: string
+        city:
+          type: string
+        price:
+          type: integer
+        thumbnail:
+          type: string
+        capacity:
+          type: integer
+        available_tickets:
+          type: integer
+        status:
+          type: string
+          enum: [available, sold_out, cancelled]
+
+    GetShowRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Show'
+        message:
+          type: string
+          example: Show data retrieved
+
+    GetShowError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: Show not found
+
+    CreateShowRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        show_id:
+          type: integer
+          example: 10
+        message:
+          type: string
+          example: Show created
+
+    CreateShowError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: Invalid show data
+
+    UpdateShowRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: Show updated
+
+    UpdateShowError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: Update failed
+
+    DeleteShowRes:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          example: Show deleted
+
+    DeleteShowError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+          example: Delete failed
