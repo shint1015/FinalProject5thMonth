@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+
+use App\Middleware\AuthMiddleware;
+
 function PaymentRouter(string $pathInfo, string $method): array {
     include_once __DIR__ . '/../Controllers/PaymentController.php';
     $controller = new PaymentController();
@@ -7,6 +11,7 @@ function PaymentRouter(string $pathInfo, string $method): array {
     $resource = $pathParts[0] ?? '';
     $id = $pathParts[1] ?? '';
 
+    AuthMiddleware::requireAuth();
     switch ($method) {
         case 'GET':
             // GET /payment/{id}

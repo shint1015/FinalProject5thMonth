@@ -8,6 +8,7 @@ include_once __DIR__ . '/../Services/AuditService.php';
 class PaymentController
 {
     private PaymentService $service;
+    private AuditService $auditService;
 
     public function __construct()
     {

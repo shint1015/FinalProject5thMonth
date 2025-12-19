@@ -1,4 +1,4 @@
-INSERT INTO `users` (`id`, `email`, `first_name`, `last_name`, `display_name`, `password`, `role`, `created_at`, `updated_at`) VALUES
+INSERT INTO `users` (`user_id`, `email`, `first_name`, `last_name`, `display_name`, `password`, `role`, `created_at`, `updated_at`) VALUES
 (4, 'ryo29698@example.com', 'Ryo', 'Tanaka', 'ryo_t', '$2y$10$WYXH5iFTT/lCG3m0sfQ0LuvAGIyuu.wYLIHhL2N.qBEhZojRIkYTu', 'admin', '2025-12-10 01:54:32', NULL),
 (5, 'emi22445@example.com', 'Emi', 'Sato', 'emi_s', '$2y$10$Ca7t2paYUtrJZ7YFva2X3OayTej2hWDzFPOYZEtNpHE2yTSvIuSb6', 'general', '2025-12-10 01:54:37', NULL),
 (6, 'ken22359@example.com', 'Ken', 'Fujita', 'ken_f', '$2y$10$0mj7A5HRxmNHWFgDXeqNou54zOUGmWMMe9X/JJTaeFoGUuypBy7Tm', 'general', '2025-12-10 01:54:41', NULL),

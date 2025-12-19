@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+
+use App\Middleware\AuthMiddleware;
 
 function ReservationRouter(string $pathInfo, string $method): array
 {
@@ -10,8 +13,8 @@ function ReservationRouter(string $pathInfo, string $method): array
     $resource = $parts[0] ?? null; // reservation
     $id = $parts[1] ?? null; // reservation_id || show
     $extra = $parts[2] ?? null; // show_id
+    AuthMiddleware::requireAuth();
     switch ($method) {
-
         case 'GET':
             // GET /reservation/10
             if ($resource === 'reservation' && is_numeric($id)) {

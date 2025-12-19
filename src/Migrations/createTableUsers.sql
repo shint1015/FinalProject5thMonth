@@ -2,7 +2,7 @@
 -- Run this SQL in your MySQL database
 
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `first_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `last_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,

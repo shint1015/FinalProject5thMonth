@@ -118,8 +118,8 @@ class ReservationController
             $showId === null ||
             $userId === null ||
             $ticketAmount === null ||
-            $totalPrice === null ||
-            $duration === null
+            $totalPrice === null
+            // $duration === null
         ){
             return [[
                 'success' => false,
@@ -190,8 +190,8 @@ class ReservationController
             $showId === null ||
             $userId === null ||
             $ticketAmount === null ||
-            $totalPrice === null ||
-            $duration === null
+            $totalPrice === null
+            // $duration === null
         ){
             return [[
                 'success' => false,

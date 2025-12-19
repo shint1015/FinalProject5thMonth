@@ -8,7 +8,8 @@ include_once __DIR__ . '/../Services/AuditService.php';
 class SeatController
 {
     private SeatService $service;
-
+    private AuditService $auditService;
+    
     public function __construct()
     {
         $repo = new SeatRepository(db());

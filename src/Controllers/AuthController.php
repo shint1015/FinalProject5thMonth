@@ -20,7 +20,6 @@ class AuthController {
 	public function login(): array {
 		$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') ?? '');
 		$password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') ?? '';
-
 		if ($username === '' || $password === '') {
 			return [["error" => "username and password are required"], 400];
 		}

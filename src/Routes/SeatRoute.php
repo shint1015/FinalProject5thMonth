@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+
+use App\Middleware\AuthMiddleware;
+
 function SeatRouter(string $pathInfo, string $method): array {
     include_once __DIR__ . '/../Controllers/SeatController.php';
     $controller = new SeatController();
@@ -8,8 +12,8 @@ function SeatRouter(string $pathInfo, string $method): array {
     $resource = $pathParts[0] ?? '';
     $id = $pathParts[1] ?? '';
 
+    AuthMiddleware::requireAuth();
     switch ($method) {
-
         // GET: seat/{id} or seat/list
         case 'GET':
             // GET /seat/{id}
