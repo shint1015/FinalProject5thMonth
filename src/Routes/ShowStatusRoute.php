@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../Middlewares/AuthMiddleware.php';
+use App\Middleware\AuthMiddleware;
+
 function ShowStatusRouter(string $pathInfo, string $method):array {
     include_once __DIR__ . '/../Controllers/ShowStatusController.php';
     $controller = new ShowStatusController();
@@ -6,6 +10,10 @@ function ShowStatusRouter(string $pathInfo, string $method):array {
     $pathParts = explode('/', $pathInfo);
     $resource = $pathParts[0] ?? '';
     $id = $pathParts[1] ?? '';
+    $protectedMethods = ['POST', 'PUT', 'DELETE'];
+    if (in_array($method, $protectedMethods, true)) {
+        AuthMiddleware::requireAdmin();
+    }
 
     switch ($method) {
         case 'GET':
@@ -16,7 +24,8 @@ function ShowStatusRouter(string $pathInfo, string $method):array {
             } else {
                 return [['error' => 'Not Found'], 404];
             }
-        case 'POST':
+        
+            case 'POST':
             if ($resource === 'show_status') {
                 return $controller->createStatus();
             } else {
